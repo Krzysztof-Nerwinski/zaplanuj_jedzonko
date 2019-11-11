@@ -5,13 +5,13 @@ from django.db import models
 
 class DayName(models.Model):
     DAYS = (
-        ('PN', 'Poniedziałek'),
-        ('WT', 'Wtorek'),
-        ('ŚR', 'Środa'),
-        ('CZW', 'Czwartek'),
-        ('PT', 'Piątek'),
-        ('SB', 'Sobota'),
-        ('ND', 'Niedziela'),
+        ('MON', 'Monday'),
+        ('TUE', 'Tuesday'),
+        ('WED', 'Wednesday'),
+        ('THU', 'Thursday'),
+        ('FRI', 'Friday'),
+        ('SAT', 'Saturday'),
+        ('SUN', 'Sunday'),
     )
     day_name = models.CharField(max_length=3, choices=DAYS)
     order = models.IntegerField(unique=True)
