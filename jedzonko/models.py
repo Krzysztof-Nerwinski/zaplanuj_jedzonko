@@ -4,12 +4,21 @@ from django.db import models
 # Create your models here.
 
 class DayName(models.Model):
-    day_name = models.CharField(max_length=16)
+    DAYS = (
+        ('PN', 'Poniedziałek'),
+        ('WT', 'Wtorek'),
+        ('ŚR', 'Środa'),
+        ('CZW', 'Czwartek'),
+        ('PT', 'Piątek'),
+        ('SB', 'Sobota'),
+        ('ND', 'Niedziela'),
+    )
+    day_name = models.CharField(max_length=3, choices=DAYS)
     order = models.IntegerField(unique=True)
 
 
 class Recipe(models.Model):
-    name = models.CharField(max_length=244)
+    name = models.CharField(max_length=255)
     ingredients = models.TextField()
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
@@ -19,7 +28,7 @@ class Recipe(models.Model):
 
 
 class Plan(models.Model):
-    name = models.CharField(max_length=124)
+    name = models.CharField(max_length=255)
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     recipe = models.ManyToManyField(Recipe, through='RecipePlan')
@@ -36,4 +45,4 @@ class RecipePlan(models.Model):
 class Page(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    slug = models.SlugField(max_length=124, unique=True)
+    slug = models.SlugField(max_length=255, unique=True)
