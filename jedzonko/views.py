@@ -16,8 +16,16 @@ class DashboardView(View):
     def get(self, request):
         plans_no = count(Plan)
         recipes_no = count(Recipe)
-        return render(request, "dashboard.html",context={'plans_no':plans_no,
-                                                         'recipes_no':recipes_no})
+        last_plan = Plan.objects.all().order_by('-created')[0]
+        weekly_plan = []
+        for day_number in range(1, 8):
+            if bool(last_plan.recipeplan_set.filter(day_name=day_number)) is not False:
+                weekly_plan.append(last_plan.recipeplan_set.filter(day_name=day_number).order_by('order'))
+        return render(request, "dashboard.html", context={'plans_no': plans_no,
+                                                          'recipes_no': recipes_no,
+                                                          'last_plan': last_plan,
+                                                          'weekly_plan': weekly_plan,
+                                                          'days':DayName.DAYS})
 
 
 class RecipeView(View):
