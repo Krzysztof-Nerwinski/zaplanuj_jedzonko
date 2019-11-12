@@ -22,10 +22,10 @@
             </thead>
             <tbody class="text-color-lighter">
             {% for recipe in recipes %}
-            <tr class="d-flex">
-                <th scope="row" class="col-1">{{ recipe.id }}</th>
+                <tr class="d-flex">
+                    <th scope="row" class="col-1">{{ recipe.id }}</th>
                     <td class="col-2">{{ recipe.name }} ({{ recipe.votes }})</td>
-                    <td clas="col-7" >{{ recipe.description}}</td>
+                    <td clas="col-7">{{ recipe.description }}</td>
                     <td class="col-2 d-flex align-items-center justify-content-center flex-wrap">
                         <a href="#"
                            class="btn btn-danger rounded-0 text-light m-1">Usuń</a>
@@ -34,42 +34,43 @@
                         <a href="/recipe/modify/{{ recipe.id }}/"
                            class="btn btn-warning rounded-0 text-light m-1">Edytuj</a>
                     </td>
-                    </tr>
-                {% endfor %}
+                </tr>
+            {% endfor %}
             </tbody>
 
         </table>
     </div>
 
-<div class = "container" >
-  <div class = "col-md-6">
-    <nav aria-label="Page navigation">
-      <ul class="pagination">
-        <li class="page-item">  <!-- Jump to Previous Page -->
-          {% if object_list.has_previous %}
-             <li class="previous"> <a href="?page={{ object_list.previous_page_number }}">
-             <span aria-hidden="true"> < poprzednia &nbsp;</span></a>
-          {% else %}
-              <li class="previous disabled"><a>  </a>
-          {% endif %}
-        </li>
-         {% for page in object_list.paginator.page_range %}
-            {% if page == object_list.number %}
-            <li class="pg active"><a class = "page_number" href="?page={{page}}"> | {{page}} |</a>
-            {% else %}
-            <li class="pg"><a class = "page_number" href="?page={{page}}"> | {{page}} |</a>
-            {% endif %}
-        {% endfor %}
-        <li class="page-item">  <!-- Jump to Next Page -->
-          {% if object_list.has_next %}
-            <li class="previous"> <a href="?page={{ object_list.next_page_number }}">&nbsp;następna ></a></li>
-          {% else %}
-              <li class="next disabled"><a> </a>
-          {% endif %}
-        </li>
-      </ul>
-    </nav>
-  </div>
-</div>
+    <div class="container">
+        <div class="col-md-6">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item">  <!-- Jump to Previous Page -->
+                        {% if object_list.has_previous %}
+                            <li class="previous"><a href="?page={{ object_list.previous_page_number }}">
+                                <span aria-hidden="true"> < poprzednia &nbsp;</span></a>
+                                {% else %}
+                            <li class="previous disabled"><a> </a>
+                        {% endif %}
+                        </li>
+                    {% for page in object_list.paginator.page_range %}
+                        {% if page == object_list.number %}
+                            <li class="pg active"><a class="page_number" href="?page={{ page }}"> | {{ page }} |</a>
+                                {% else %}
+                            <li class="pg"><a class="page_number" href="?page={{ page }}"> | {{ page }} |</a>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item">  <!-- Jump to Next Page -->
+                        {% if object_list.has_next %}
+                            <li class="previous"><a href="?page={{ object_list.next_page_number }}">&nbsp;następna ></a>
+                            </li>
+                        {% else %}
+                            <li class="next disabled"><a> </a>
+                        {% endif %}
+                        </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 
 {% endblock content %}

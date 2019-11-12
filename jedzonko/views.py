@@ -3,7 +3,6 @@ import random
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views import View
-from django.views.generic import ListView
 
 from jedzonko.models import *
 from jedzonko.utils import count
@@ -47,7 +46,7 @@ class DashboardView(View):
                                                           'recipes_no': recipes_no})
 
 
-class RecipeView(ListView):
+class RecipeView(View):
 
     def get(self, request, id):
         return render(request, "test.html")
@@ -59,7 +58,7 @@ class RecipeListView(View):
         paginator = Paginator(recipes, 3)  # Show 50 recipes per page
         page = request.GET.get('page')
         recipes = paginator.get_page(page)
-        return render(request, 'app-recipes.html', {'recipes': recipes, "object_list":recipes})
+        return render(request, 'app-recipes.html', {'recipes': recipes, "object_list": recipes})
 
 
 class RecipeAddView(View):
