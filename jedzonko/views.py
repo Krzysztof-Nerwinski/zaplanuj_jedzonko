@@ -65,7 +65,7 @@ class RecipeListView(View):
         paginator = Paginator(recipes, 3)  # Show 50 recipes per page
         page = request.GET.get('page')
         recipes = paginator.get_page(page)
-        return render(request, 'app-recipes.html', {'recipes': recipes, "object_list": recipes})
+        return render(request, 'app-recipes.html', {"object_list": recipes})
 
 
 class RecipeAddView(View):
@@ -105,7 +105,7 @@ class PlanListView(View):
         paginator = Paginator(plans, 3)  # Show 50 recipes per page
         page = request.GET.get('page')
         plans = paginator.get_page(page)
-        return render(request, 'app-schedules.html', {'plans': plans, "object_list": plans})
+        return render(request, 'app-schedules.html', {"object_list": plans})
 
 
 class PlanModifyView(View):
