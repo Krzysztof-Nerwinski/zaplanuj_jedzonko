@@ -24,8 +24,7 @@ class DashboardView(View):
         return render(request, "dashboard.html", context={'plans_no': plans_no,
                                                           'recipes_no': recipes_no,
                                                           'last_plan': last_plan,
-                                                          'weekly_plan': weekly_plan,
-                                                          'days':DayName.DAYS})
+                                                          'weekly_plan': weekly_plan})
 
 
 class RecipeView(View):
