@@ -13,8 +13,18 @@ class DayName(models.Model):
         ('SAT', 'Saturday'),
         ('SUN', 'Sunday'),
     )
+    ORDER = (
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5),
+        (6, 6),
+        (7, 7),
+
+    )
     day_name = models.CharField(max_length=3, choices=DAYS)
-    order = models.IntegerField(unique=True)
+    order = models.IntegerField(choices=ORDER, unique=True)
 
 
 class Recipe(models.Model):
