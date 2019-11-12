@@ -30,5 +30,4 @@ urlpatterns = [
     path('plan/list/', PlanListView.as_view(), name='plan_list'),
     path('plan/add/', PlanAddView.as_view(), name='plan_add'),
     path('plan/add-recipe/', PlanAddRecipeView.as_view(), name='plan_add_recipe'),
-
 ]

@@ -1,7 +1,9 @@
-from datetime import datetime
 import random
+
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views import View
+
 from jedzonko.models import *
 from jedzonko.utils import count
 
@@ -27,12 +29,12 @@ class IndexView(View):
         recipe_three_name = Recipe.objects.get(pk=carusel_three).name
         recipe_three_description = Recipe.objects.get(pk=carusel_three).description
 
-
-        return render(request, "index.html", context={'recipe_one_name': recipe_one_name, 'recipe_one_description': recipe_one_description,
-                                                      'recipe_two_name': recipe_two_name, 'recipe_two_description': recipe_two_description,
-                                                      'recipe_three_name': recipe_three_name, 'recipe_three_description': recipe_three_description
-        })
-
+        return render(request, "index.html",
+                      context={'recipe_one_name': recipe_one_name, 'recipe_one_description': recipe_one_description,
+                               'recipe_two_name': recipe_two_name, 'recipe_two_description': recipe_two_description,
+                               'recipe_three_name': recipe_three_name,
+                               'recipe_three_description': recipe_three_description
+                               })
 
 
 class DashboardView(View):
@@ -51,6 +53,7 @@ class DashboardView(View):
                                                           'weekly_plan': weekly_plan})
 
 
+
 class RecipeView(View):
 
     def get(self, request, id):
@@ -58,9 +61,12 @@ class RecipeView(View):
 
 
 class RecipeListView(View):
-
     def get(self, request):
-        return render(request, "test.html")
+        recipes = Recipe.objects.order_by('-votes', "created")
+        paginator = Paginator(recipes, 3)  # Show 50 recipes per page
+        page = request.GET.get('page')
+        recipes = paginator.get_page(page)
+        return render(request, 'app-recipes.html', {'recipes': recipes, "object_list": recipes})
 
 
 class RecipeAddView(View):
