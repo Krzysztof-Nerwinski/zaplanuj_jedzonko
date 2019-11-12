@@ -1,10 +1,10 @@
 from datetime import datetime
 import random
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from jedzonko.models import *
 from jedzonko.utils import count
-
+import datetime
 
 class IndexView(View):
 
@@ -59,7 +59,26 @@ class RecipeListView(View):
 class RecipeAddView(View):
 
     def get(self, request):
-        return render(request, "test.html")
+        request.POST.get
+        return render(request, "app-add-recipe.html")
+
+    def post(self, request):
+
+        receipe_name = request.POST.get('receipe_name')
+        receipe_time = (request.POST.get('receipe_time'))
+        recepie_description = request.POST.get('recepie_description')
+        recepie_ingredients = request.POST.get('recepie_ingredients')
+
+
+
+        if receipe_name !="" and receipe_time !="" and recepie_description !="" and recepie_ingredients !="":
+            receipe_time_int = int(receipe_time)
+            Recipe.objects.create(name=receipe_name, ingredients=recepie_ingredients, description=recepie_description,
+                                  preparation_time=receipe_time_int)
+            return redirect('/recipe/list')
+        else:
+            return render(request, 'app-add-recipe.html', context={'add_data': "Wypełnij poprawnie wszystkie pola"})
+
 
 
 class RecipeModifyView(View):
@@ -84,6 +103,7 @@ class PlanAddRecipeView(View):
 
     def get(self, request):
         return render(request, "test.html")
+
 
 
 class PlanListView(View):
