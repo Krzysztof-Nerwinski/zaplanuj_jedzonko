@@ -49,17 +49,17 @@ class DashboardView(View):
 
 class RecipeView(ListView):
 
-    def get(self, request):
+    def get(self, request, id):
         return render(request, "test.html")
 
 
 class RecipeListView(View):
     def get(self, request):
-        recipes = Recipe.objects.all()
-        paginator = Paginator(recipes, 2)  # Show 25 contacts per page
+        recipes = Recipe.objects.order_by('-votes', "created")
+        paginator = Paginator(recipes, 3)  # Show 50 recipes per page
         page = request.GET.get('page')
         recipes = paginator.get_page(page)
-        return render(request, 'app-recipes.html', {'recipes': recipes})
+        return render(request, 'app-recipes.html', {'recipes': recipes, "object_list":recipes})
 
 
 class RecipeAddView(View):
