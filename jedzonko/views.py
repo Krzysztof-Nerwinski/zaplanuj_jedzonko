@@ -9,7 +9,6 @@ class IndexView(View):
     def get(self, request):
         return render(request, "index.html")
 
-
 class DashboardView(View):
 
     def get(self, request):
