@@ -1,7 +1,8 @@
 from datetime import datetime
-
 from django.shortcuts import render
 from django.views import View
+from jedzonko.models import *
+from jedzonko.utils import count
 
 
 class IndexView(View):
@@ -9,10 +10,14 @@ class IndexView(View):
     def get(self, request):
         return render(request, "index.html")
 
+
 class DashboardView(View):
 
     def get(self, request):
-        return render(request, "dashboard.html")
+        plans_no = count(Plan)
+        recipes_no = count(Recipe)
+        return render(request, "dashboard.html",context={'plans_no':plans_no,
+                                                         'recipes_no':recipes_no})
 
 
 class RecipeView(View):
