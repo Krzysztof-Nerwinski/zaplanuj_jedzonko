@@ -1,7 +1,10 @@
-from datetime import datetime
 import random
+
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views import View
+from django.views.generic import ListView
+
 from jedzonko.models import *
 from jedzonko.utils import count
 
@@ -27,12 +30,12 @@ class IndexView(View):
         recipe_three_name = Recipe.objects.get(pk=carusel_three).name
         recipe_three_description = Recipe.objects.get(pk=carusel_three).description
 
-
-        return render(request, "index.html", context={'recipe_one_name': recipe_one_name, 'recipe_one_description': recipe_one_description,
-                                                      'recipe_two_name': recipe_two_name, 'recipe_two_description': recipe_two_description,
-                                                      'recipe_three_name': recipe_three_name, 'recipe_three_description': recipe_three_description
-        })
-
+        return render(request, "index.html",
+                      context={'recipe_one_name': recipe_one_name, 'recipe_one_description': recipe_one_description,
+                               'recipe_two_name': recipe_two_name, 'recipe_two_description': recipe_two_description,
+                               'recipe_three_name': recipe_three_name,
+                               'recipe_three_description': recipe_three_description
+                               })
 
 
 class DashboardView(View):
@@ -40,20 +43,23 @@ class DashboardView(View):
     def get(self, request):
         plans_no = count(Plan)
         recipes_no = count(Recipe)
-        return render(request, "dashboard.html",context={'plans_no':plans_no,
-                                                         'recipes_no':recipes_no})
+        return render(request, "dashboard.html", context={'plans_no': plans_no,
+                                                          'recipes_no': recipes_no})
 
 
-class RecipeView(View):
+class RecipeView(ListView):
 
-    def get(self, request, id):
+    def get(self, request):
         return render(request, "test.html")
 
 
 class RecipeListView(View):
-
     def get(self, request):
-        return render(request, "test.html")
+        recipes = Recipe.objects.all()
+        paginator = Paginator(recipes, 2)  # Show 25 contacts per page
+        page = request.GET.get('page')
+        recipes = paginator.get_page(page)
+        return render(request, 'app-recipes.html', {'recipes': recipes})
 
 
 class RecipeAddView(View):
