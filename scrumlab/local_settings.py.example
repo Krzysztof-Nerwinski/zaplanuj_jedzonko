@@ -3,10 +3,11 @@
 
 DATABASES = {
     'default': {
-        'HOST': '127.0.0.1',
-        'NAME': 'scrum',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': 'postgres',
-        'PASSWORD': 'coderslab',
-}
+        'NAME': '<tu wprowadź nazwę bazy danych>',
+        'HOST': 'localhost',
+        'PASSWORD': '<tu wpisz hasło bazy danych>',
+        'USER': '<tu wprowadź nazwę użytkownika>',
+        'PORT': 5432
+    }
 }
