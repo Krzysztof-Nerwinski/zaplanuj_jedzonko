@@ -108,12 +108,23 @@ class RecipeModifyView(View):
     def get(self, request, id):
         return render(request, "test.html")
 
-
-class PlanView(View):
+class RecipeDeleteView(View):
 
     def get(self, request, id):
         return render(request, "test.html")
 
+class PlanView(View):
+    def get(self, request, id):
+        plan = Plan.objects.get(id=id)
+        day_name = DayName.objects.all()
+        weekly_plan = []
+        for day_number in range(1, 8):
+            if bool(plan.recipeplan_set.filter(day_name=day_number)) is not False:
+                weekly_plan.append(plan.recipeplan_set.filter(day_name=day_number).order_by('order'))
+        return render(request, "app-details-schedules.html", context={"day_name": day_name,
+                                                        'plan': plan,
+                                                        'weekly_plan': weekly_plan
+                                                                      })
 
 class PlanAddView(View):
 
