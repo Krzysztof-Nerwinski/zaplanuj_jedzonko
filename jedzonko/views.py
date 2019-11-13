@@ -59,23 +59,23 @@ class RecipeListView(View):
 class RecipeAddView(View):
 
     def get(self, request):
-        request.POST.get
+
         return render(request, "app-add-recipe.html")
 
     def post(self, request):
 
-        receipe_name = request.POST.get('receipe_name')
-        receipe_time = (request.POST.get('receipe_time'))
-        recepie_description = request.POST.get('receipe_description')
-        recepie_ingredients = request.POST.get('receipe_ingredients')
+        recipe_name = request.POST.get('recipe_name')
+        recipe_time = (request.POST.get('recipe_time'))
+        recipe_description = request.POST.get('recipe_description')
+        recipe_ingredients = request.POST.get('recipe_ingredients')
 
 
 
-        if receipe_name !="" and receipe_time !="" and recepie_description !="" and recepie_ingredients !="" :
-            receipe_time_int = int(receipe_time)
-            if receipe_time_int>0:
-                Recipe.objects.create(name=receipe_name, ingredients=recepie_ingredients, description=recepie_description,
-                                      preparation_time=receipe_time_int)
+        if recipe_name !="" and recipe_time !="" and recipe_description !="" and recipe_ingredients !="" :
+            recipe_time_int = int(recipe_time)
+            if recipe_time_int > 0:
+                Recipe.objects.create(name=recipe_name, ingredients=recipe_ingredients, description=recipe_description,
+                                      preparation_time=recipe_time_int)
                 return redirect('recipe_list')
             else:
                 return render(request, 'app-add-recipe.html', context={'add_data': "Wypełnij poprawnie wszystkie pola"})
