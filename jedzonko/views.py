@@ -112,8 +112,7 @@ class PlanAddView(View):
 
 
     def get(self, request):
-        #do edycji planów
-        # recipe = Recipe.objects.all()
+
 
         return render(request, "app-add-schedules.html")
     def post(self, request):
@@ -122,7 +121,7 @@ class PlanAddView(View):
 
         Plan.objects.create(name=plan_name, description = plan_description)
         last_id = Plan.objects.all().order_by('-id')[0].id
-        return redirect(f'/plan/<{last_id}>/details')
+        return redirect('plan', last_id)
 
 
 
