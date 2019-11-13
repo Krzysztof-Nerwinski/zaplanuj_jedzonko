@@ -53,7 +53,6 @@ class DashboardView(View):
                                                           'weekly_plan': weekly_plan})
 
 
-
 class RecipeView(View):
 
     def get(self, request, id):
@@ -66,7 +65,7 @@ class RecipeListView(View):
         paginator = Paginator(recipes, 3)  # Show 50 recipes per page
         page = request.GET.get('page')
         recipes = paginator.get_page(page)
-        return render(request, 'app-recipes.html', {'recipes': recipes, "object_list": recipes})
+        return render(request, 'app-recipes.html', {"object_list": recipes})
 
 
 class RecipeAddView(View):
@@ -102,4 +101,13 @@ class PlanAddRecipeView(View):
 class PlanListView(View):
 
     def get(self, request):
+        plans = Plan.objects.order_by('name')
+        paginator = Paginator(plans, 3)  # Show 50 recipes per page
+        page = request.GET.get('page')
+        plans = paginator.get_page(page)
+        return render(request, 'app-schedules.html', {"object_list": plans})
+
+
+class PlanModifyView(View):
+    def get(self, request, id):
         return render(request, "test.html")
