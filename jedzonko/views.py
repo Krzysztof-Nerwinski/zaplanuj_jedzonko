@@ -49,8 +49,7 @@ class DashboardView(View):
         for day_number in day_names:
             meals = last_plan.recipeplan_set.filter(day_name=day_number.id).order_by('order')
             day = DayName.objects.get(id=day_number.id).get_day_name_display()
-            meals_day = (meals, day)
-            weekly_plan.append(meals_day)
+            weekly_plan.append((meals, day))
         return render(request, "dashboard.html", context={'plans_no': plans_no,
                                                           'recipes_no': recipes_no,
                                                           'last_plan': last_plan,
@@ -124,8 +123,7 @@ class PlanView(View):
         for day_number in day_names:
             meals =  plan.recipeplan_set.filter(day_name=day_number.id).order_by('order')
             day = DayName.objects.get(id=day_number.id).get_day_name_display()
-            meals_day = (meals, day)
-            weekly_plan.append(meals_day)
+            weekly_plan.append((meals, day))
         return render(request, "app-details-schedules.html", context={'plan': plan,
                                                                       'weekly_plan': weekly_plan})
 
