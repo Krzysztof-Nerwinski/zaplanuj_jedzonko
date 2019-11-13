@@ -61,7 +61,18 @@ class RecipeView(View):
         return render(request, "app-recipe-details.html",context={'recipe':recipe,
                                                                   'ingridients':ingredients})
     def post(self,request,id):
-        pass
+        if 'vote_up' in request.POST:               #like
+            temp_id = request.POST.get('recipe_id')
+            recipe = Recipe.objects.get(id=temp_id)
+            recipe.votes += 1
+            recipe.save()
+            return redirect('recipe', id)
+        elif 'vote_down' in request.POST:
+            temp_id = request.POST.get('recipe_id')
+            recipe = Recipe.objects.get(id=temp_id)
+            recipe.votes -= 1
+            recipe.save()
+            return redirect('recipe', id)
 
 
 
