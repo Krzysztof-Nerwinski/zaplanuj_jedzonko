@@ -38,6 +38,7 @@ class Recipe(models.Model):
     votes = models.IntegerField(default=0)
 
 
+
 class Plan(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
