@@ -60,6 +60,9 @@ class RecipeView(View):
         ingredients = re_split(r'\.|\,',recipe.ingredients)  #split on [dot|comma]
         return render(request, "app-recipe-details.html",context={'recipe':recipe,
                                                                   'ingridients':ingredients})
+    def post(self,request,id):
+        pass
+
 
 
 class RecipeListView(View):
