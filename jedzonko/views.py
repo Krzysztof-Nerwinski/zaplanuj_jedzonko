@@ -6,7 +6,7 @@ from django.views import View
 
 from jedzonko.models import *
 from jedzonko.utils import count
-
+from re import split as re_split
 
 class IndexView(View):
 
@@ -56,7 +56,10 @@ class DashboardView(View):
 class RecipeView(View):
 
     def get(self, request, id):
-        return render(request, "test.html")
+        recipe = Recipe.objects.get(pk=id)
+        ingredients = re_split(r'\.|\,',recipe.ingredients)  #split on [dot|comma]
+        return render(request, "app-recipe-details.html",context={'recipe':recipe,
+                                                                  'ingridients':ingredients})
 
 
 class RecipeListView(View):
