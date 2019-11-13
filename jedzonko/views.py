@@ -1,7 +1,8 @@
-from datetime import datetime
 import random
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from django.views import View
+
 from jedzonko.models import *
 from jedzonko.utils import count
 import datetime
@@ -27,12 +28,12 @@ class IndexView(View):
         recipe_three_name = Recipe.objects.get(pk=carusel_three).name
         recipe_three_description = Recipe.objects.get(pk=carusel_three).description
 
-
-        return render(request, "index.html", context={'recipe_one_name': recipe_one_name, 'recipe_one_description': recipe_one_description,
-                                                      'recipe_two_name': recipe_two_name, 'recipe_two_description': recipe_two_description,
-                                                      'recipe_three_name': recipe_three_name, 'recipe_three_description': recipe_three_description
-        })
-
+        return render(request, "index.html",
+                      context={'recipe_one_name': recipe_one_name, 'recipe_one_description': recipe_one_description,
+                               'recipe_two_name': recipe_two_name, 'recipe_two_description': recipe_two_description,
+                               'recipe_three_name': recipe_three_name,
+                               'recipe_three_description': recipe_three_description
+                               })
 
 
 class DashboardView(View):
@@ -40,8 +41,15 @@ class DashboardView(View):
     def get(self, request):
         plans_no = count(Plan)
         recipes_no = count(Recipe)
-        return render(request, "dashboard.html",context={'plans_no':plans_no,
-                                                         'recipes_no':recipes_no})
+        last_plan = Plan.objects.all().order_by('-created')[0]
+        weekly_plan = []
+        for day_number in range(1, 8):
+            if bool(last_plan.recipeplan_set.filter(day_name=day_number)) is not False:
+                weekly_plan.append(last_plan.recipeplan_set.filter(day_name=day_number).order_by('order'))
+        return render(request, "dashboard.html", context={'plans_no': plans_no,
+                                                          'recipes_no': recipes_no,
+                                                          'last_plan': last_plan,
+                                                          'weekly_plan': weekly_plan})
 
 
 class RecipeView(View):
@@ -51,9 +59,12 @@ class RecipeView(View):
 
 
 class RecipeListView(View):
-
     def get(self, request):
-        return render(request, "test.html")
+        recipes = Recipe.objects.order_by('-votes', "created")
+        paginator = Paginator(recipes, 3)  # Show 50 recipes per page
+        page = request.GET.get('page')
+        recipes = paginator.get_page(page)
+        return render(request, 'app-recipes.html', {"object_list": recipes})
 
 
 class RecipeAddView(View):
@@ -112,4 +123,13 @@ class PlanAddRecipeView(View):
 class PlanListView(View):
 
     def get(self, request):
+        plans = Plan.objects.order_by('name')
+        paginator = Paginator(plans, 3)  # Show 50 recipes per page
+        page = request.GET.get('page')
+        plans = paginator.get_page(page)
+        return render(request, 'app-schedules.html', {"object_list": plans})
+
+
+class PlanModifyView(View):
+    def get(self, request, id):
         return render(request, "test.html")

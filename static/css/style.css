@@ -29,6 +29,11 @@ body {
   background: repeat url("/static/images/image.png");
 }
 
+li.pg.active {
+  color: #000000;
+  font-weight: bold;
+}
+
 p {
   font-size: 1.2rem;
 }
@@ -163,6 +168,10 @@ margin: 0 auto !important;
 
 .main-logo span {
   color: var(--link-color);
+}
+
+.container2 {
+  margin: 0;
 }
 
 /*------------------------------*/
