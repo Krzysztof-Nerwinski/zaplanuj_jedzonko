@@ -1,12 +1,11 @@
 import random
-
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 
 from jedzonko.models import *
 from jedzonko.utils import count
-
+import datetime
 
 class IndexView(View):
 
@@ -71,7 +70,29 @@ class RecipeListView(View):
 class RecipeAddView(View):
 
     def get(self, request):
-        return render(request, "test.html")
+
+        return render(request, "app-add-recipe.html")
+
+    def post(self, request):
+
+        recipe_name = request.POST.get('recipe_name')
+        recipe_time = (request.POST.get('recipe_time'))
+        recipe_description = request.POST.get('recipe_description')
+        recipe_ingredients = request.POST.get('recipe_ingredients')
+
+
+
+        if recipe_name !="" and recipe_time !="" and recipe_description !="" and recipe_ingredients !="" :
+            recipe_time_int = int(recipe_time)
+            if recipe_time_int > 0:
+                Recipe.objects.create(name=recipe_name, ingredients=recipe_ingredients, description=recipe_description,
+                                      preparation_time=recipe_time_int)
+                return redirect('recipe_list')
+            else:
+                return render(request, 'app-add-recipe.html', context={'add_data': "Wypełnij poprawnie wszystkie pola"})
+        else:
+            return render(request, 'app-add-recipe.html', context={'add_data': "Wypełnij poprawnie wszystkie pola"})
+
 
 
 class RecipeModifyView(View):
@@ -96,6 +117,7 @@ class PlanAddRecipeView(View):
 
     def get(self, request):
         return render(request, "test.html")
+
 
 
 class PlanListView(View):
