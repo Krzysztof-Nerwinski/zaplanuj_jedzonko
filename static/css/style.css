@@ -165,6 +165,10 @@ margin: 0 auto !important;
   color: var(--link-color);
 }
 
+.container2 {
+  margin: 0;
+}
+
 /*------------------------------*/
 /*---- Slider section----*/
 /*------------------------------*/
