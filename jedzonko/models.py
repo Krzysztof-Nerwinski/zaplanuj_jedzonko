@@ -53,6 +53,7 @@ class RecipePlan(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.SET_NULL, null=True)
 
 
+
 class Page(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
