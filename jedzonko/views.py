@@ -6,6 +6,7 @@ from django.views import View
 from jedzonko.models import *
 from jedzonko.utils import count
 import datetime
+import urllib
 
 class IndexView(View):
 
@@ -117,7 +118,23 @@ class PlanAddView(View):
 class PlanAddRecipeView(View):
 
     def get(self, request):
-        return render(request, "test.html")
+        plan_list = Plan.objects.all()
+        recipe_list = Recipe.objects.all()
+        day_list = DayName.objects.all()
+
+
+        return render(request, "app-schedules-meal-recipe.html", context= {'plan_list': plan_list, 'recipe_list': recipe_list, 'day_list': day_list })
+
+    def post(self, request):
+        plan_id = request.POST.get('plan_id')
+        meal_name = request.POST.get('meal_name')
+        meal_no = request.POST.get('meal_no')
+        day_name = request.POST.get('day_name')
+        recipe_id = request.POST.get('recipe_id')
+
+        RecipePlan.objects.create(meal_name=meal_name, order=meal_no, day_name=DayName.objects.get(id=day_name), plan=Plan.objects.get(id=plan_id), recipe=Recipe.objects.get(id=recipe_id))
+
+        return redirect('plan', plan_id)
 
 
 
