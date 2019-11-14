@@ -7,8 +7,16 @@
         <div class="row border-bottom border-3">
             <div class="col"><h3 class="color-header text-uppercase">Szczegóły
                 przepisu</h3></div>
-            <div class="col d-flex justify-content-end mb-2"><a
-                    href="{% url 'recipe_list' %}"
+            <div class="col d-flex justify-content-end mb-2">
+            <form method="post">{% csrf_token %}
+                    <input type="hidden" name="recipe_id" value="{{ recipe.id }}">
+                    <input class="thumbs-up" type="submit" value="W górę!" name="vote_up">
+            </form>
+            <form method="post">{% csrf_token %}
+                <input type="hidden" name="recipe_id" value="{{ recipe.id }}">
+                <input class="thumbs-down" type="submit" value="W dół!" name="vote_down">
+            </form>
+                <a href="{% url 'recipe_list' %}"
                     class="btn btn-color rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
             </div>
         </div>
@@ -52,7 +60,6 @@
                 {% endfor %}
             </ul>
         </div>
-
     </div>
 </div>
 {% endblock content %}

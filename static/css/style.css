@@ -60,7 +60,7 @@ background: #EAEAEA;
 }
 .btn-color a {
   text-decoration: none;
-  color: var(--light-link-color); 
+  color: var(--light-link-color);
 }
 
 .btn-color:hover {
@@ -75,7 +75,7 @@ hr {
   margin-bottom: 4px;
   clear:both;
   display:block;
-  width: 100%;               
+  width: 100%;
   background-color:var(--background-color);
   height: 1px;
 }
@@ -399,7 +399,7 @@ margin: 0 auto !important;
 }
 .dashboard-menu .menu-item:last-child {
   margin-right: 0;
-} 
+}
 .dashboard-menu .menu-item .title {
   display: block;
   padding-top: 10px;
@@ -465,4 +465,24 @@ margin: 0 auto !important;
 }
 .schedules-content-header {
   margin-bottom: 50px;
+}
+
+.thumbs-up {
+  background: #ff6600;
+  background-image: url("/static/images/thumbs_up.png");
+  background-repeat: no-repeat;
+  width: 80px;
+  height: 100px;
+  margin-right: 1em;
+  padding-top: 70px;
+}
+
+.thumbs-down {
+  background: #ff6600;
+  background-image: url("/static/images/thumbs_down.png");
+  background-repeat: no-repeat;
+  width: 80px;
+  height: 100px;
+  margin-right: 1em;
+  padding-top: 70px;
 }

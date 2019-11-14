@@ -64,8 +64,19 @@ class RecipeView(View):
         return render(request, "app-recipe-details.html", context={'recipe': recipe,
                                                                    'ingridients': ingredients})
 
-    def post(self, request, id):
-        pass
+    def post(self,request,id):
+        if 'vote_up' in request.POST:               #like
+            temp_id = request.POST.get('recipe_id')
+            recipe = Recipe.objects.get(id=temp_id)
+            recipe.votes += 1
+            recipe.save()
+            return redirect('recipe', id)
+        elif 'vote_down' in request.POST:           #dislike
+            temp_id = request.POST.get('recipe_id')
+            recipe = Recipe.objects.get(id=temp_id)
+            recipe.votes -= 1
+            recipe.save()
+            return redirect('recipe', id)
 
 
 class RecipeListView(View):
@@ -130,11 +141,9 @@ class PlanView(View):
 
 class PlanAddView(View):
 
-
     def get(self, request):
-
-
         return render(request, "app-add-schedules.html")
+
     def post(self, request):
         plan_name = request.POST.get('plan_name')
         plan_description = request.POST.get('plan_description')
