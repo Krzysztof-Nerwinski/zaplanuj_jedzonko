@@ -1,5 +1,6 @@
 import random
 from django.core.paginator import Paginator
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views import View
 
@@ -65,14 +66,14 @@ class RecipeView(View):
         return render(request, "app-recipe-details.html", context={'recipe': recipe,
                                                                    'ingridients': ingredients})
 
-    def post(self,request,id):
-        if 'vote_up' in request.POST:               #like
+    def post(self, request, id):
+        if 'vote_up' in request.POST:  # like
             temp_id = request.POST.get('recipe_id')
             recipe = Recipe.objects.get(id=temp_id)
             recipe.votes += 1
             recipe.save()
             return redirect('recipe', id)
-        elif 'vote_down' in request.POST:           #dislike
+        elif 'vote_down' in request.POST:  # dislike
             temp_id = request.POST.get('recipe_id')
             recipe = Recipe.objects.get(id=temp_id)
             recipe.votes -= 1
@@ -119,13 +120,44 @@ class RecipeAddView(View):
 class RecipeModifyView(View):
 
     def get(self, request, id):
-        return render(request, "test.html")
+        try:
+            recipe = Recipe.objects.get(id=id)
+        except:
+            raise Http404("Brak przepisu")
+        return render(request, "app-edit-recipe.html", context={"recipe": recipe})
+
+    def post(self, request, id):
+
+        recipe_name = request.POST.get('recipe_name')
+        recipe_time = (request.POST.get('recipe_time'))
+        recipe_description = request.POST.get('recipe_description')
+        recipe_ingredients = request.POST.get('recipe_ingredients')
+        recipe_instructions = request.POST.get('recipe_instruction')
+
+        if recipe_name != "" and recipe_time != "" and recipe_description != "" and recipe_ingredients != "":
+            recipe_time_int = int(recipe_time)
+            if recipe_time_int > 0:
+                try:
+                    recipe = Recipe.objects.get(id=id)
+                except:
+                    raise Http404("Brak przepisu")
+                recipe.name = recipe_name
+                recipe.description = recipe_description
+                recipe.preparation_time = recipe_time_int
+                recipe.instructions = recipe_instructions
+                recipe.ingredients = recipe_ingredients
+                recipe.save()
+                return redirect('recipe_list')
+            else:
+                return render(request, 'app-edit-recipe.html',
+                              context={'add_data': "Wypełnij poprawnie wszystkie pola"})
+        else:
+            return render(request, 'app-edit-recipe.html', context={'add_data': "Wypełnij poprawnie wszystkie pola"})
 
 
 class RecipeDeleteView(View):
 
     def get(self, request, id):
-
         plan_id = RecipePlan.objects.get(id=id).plan_id
         RecipePlan.objects.get(id=id).delete()
 
@@ -138,7 +170,7 @@ class PlanView(View):
         day_names = DayName.objects.all()
         weekly_plan = []
         for day_number in day_names:
-            meals =  plan.recipeplan_set.filter(day_name=day_number.id).order_by('order')
+            meals = plan.recipeplan_set.filter(day_name=day_number.id).order_by('order')
             day = DayName.objects.get(id=day_number.id).get_day_name_display()
             weekly_plan.append((meals, day))
         return render(request, "app-details-schedules.html", context={'plan': plan,
@@ -154,10 +186,9 @@ class PlanAddView(View):
         plan_name = request.POST.get('plan_name')
         plan_description = request.POST.get('plan_description')
 
-        Plan.objects.create(name=plan_name, description = plan_description)
+        Plan.objects.create(name=plan_name, description=plan_description)
         last_id = Plan.objects.all().order_by('-id')[0].id
         return redirect('plan', last_id)
-
 
 
 class PlanAddRecipeView(View):
@@ -167,8 +198,8 @@ class PlanAddRecipeView(View):
         recipe_list = Recipe.objects.all()
         day_list = DayName.objects.all()
 
-
-        return render(request, "app-schedules-meal-recipe.html", context= {'plan_list': plan_list, 'recipe_list': recipe_list, 'day_list': day_list })
+        return render(request, "app-schedules-meal-recipe.html",
+                      context={'plan_list': plan_list, 'recipe_list': recipe_list, 'day_list': day_list})
 
     def post(self, request):
         plan_id = request.POST.get('plan_id')
@@ -177,7 +208,8 @@ class PlanAddRecipeView(View):
         day_name = request.POST.get('day_name')
         recipe_id = request.POST.get('recipe_id')
 
-        RecipePlan.objects.create(meal_name=meal_name, order=meal_no, day_name=DayName.objects.get(id=day_name), plan=Plan.objects.get(id=plan_id), recipe=Recipe.objects.get(id=recipe_id))
+        RecipePlan.objects.create(meal_name=meal_name, order=meal_no, day_name=DayName.objects.get(id=day_name),
+                                  plan=Plan.objects.get(id=plan_id), recipe=Recipe.objects.get(id=recipe_id))
 
         return redirect('plan', plan_id)
 
