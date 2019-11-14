@@ -38,130 +38,25 @@
                     <h2 class="dashboard-content-title">
                         <span>Ostatnio dodany plan:</span> {{ last_plan.name }}
                     </h2>
+                {% for recipes,day in weekly_plan %}
                     <table class="table">
                         <thead>
                             <tr class="d-flex">
-                                <th class="col-2">Poniedziałek</th>
+                                <th class="col-2">{{ day }}</th>
                                 <th class="col-8"></th>
                                 <th class="col-2"></th>
                             </tr
                         </thead>
+                    {% for recipe in recipes %}
                         <tbody>
-                        {% for meal in weekly_plan.0 %}
                             <tr class="d-flex">
-                                <td class="col-2">{{ meal.meal_name}}</td>
-                                <td class="col-8">{{ meal.recipe.name }}</td>
-                                <td class="col-2"><a href="{% url 'recipe' meal.recipe.id %}"><button class="btn btn-primary rounded-0">Szczegóły</button></a></td>
+                               <td class="col-2">{{ recipe.meal_name }}</td>
+                                <td class="col-8">{{ recipe.recipe.name }}</td>
+                                <td class="col-2"><a href="{% url 'recipe' recipe.id %}"><button class="btn btn-primary rounded-0">Szczegóły</button></a></td>
                             </tr>
-                        {% endfor %}
                         </tbody>
+                    {% endfor %}
                     </table>
-                    <table class="table">
-                        <thead>
-                            <tr class="d-flex">
-                                <th class="col-2">Wtorek</th>
-                                <th class="col-8"></th>
-                                <th class="col-2"></th>
-                            </tr
-                        </thead>
-                        <tbody>
-                        {% for meal in weekly_plan.1 %}
-                            <tr class="d-flex">
-                                <td class="col-2">{{ meal.meal_name}}</td>
-                                <td class="col-8">{{ meal.recipe.name }}</td>
-                                <td class="col-2"><a href="{% url 'recipe' meal.recipe.id %}"><button class="btn btn-primary rounded-0">Szczegóły</button></a></td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <table class="table">
-                        <thead>
-                            <tr class="d-flex">
-                                <th class="col-2">Środa</th>
-                                <th class="col-8"></th>
-                                <th class="col-2"></th>
-                            </tr
-                        </thead>
-                        <tbody>
-                        {% for meal in weekly_plan.2 %}
-                            <tr class="d-flex">
-                                <td class="col-2">{{ meal.meal_name}}</td>
-                                <td class="col-8">{{ meal.recipe.name }}</td>
-                                <td class="col-2"><a href="{% url 'recipe' meal.recipe.id %}"><button class="btn btn-primary rounded-0">Szczegóły</button></a></td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    <table class="table">
-                        <thead>
-                            <tr class="d-flex">
-                                <th class="col-2">Czwartek</th>
-                                <th class="col-8"></th>
-                                <th class="col-2"></th>
-                            </tr
-                        </thead>
-                        <tbody>
-                        {% for meal in weekly_plan.3 %}
-                            <tr class="d-flex">
-                                <td class="col-2">{{ meal.meal_name}}</td>
-                                <td class="col-8">{{ meal.recipe.name }}</td>
-                                <td class="col-2"><a href="{% url 'recipe' meal.recipe.id %}"><button class="btn btn-primary rounded-0">Szczegóły</button></a></td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <table class="table">
-                        <thead>
-                            <tr class="d-flex">
-                                <th class="col-2">Piątek</th>
-                                <th class="col-8"></th>
-                                <th class="col-2"></th>
-                            </tr
-                        </thead>
-                        <tbody>
-                        {% for meal in weekly_plan.4 %}
-                            <tr class="d-flex">
-                                <td class="col-2">{{ meal.meal_name}}</td>
-                                <td class="col-8">{{ meal.recipe.name }}</td>
-                                <td class="col-2"><a href="{% url 'recipe' meal.recipe.id %}"><button class="btn btn-primary rounded-0">Szczegóły</button></a></td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <table class="table">
-                        <thead>
-                            <tr class="d-flex">
-                                <th class="col-2">Sobota</th>
-                                <th class="col-8"></th>
-                                <th class="col-2"></th>
-                            </tr
-                        </thead>
-                        <tbody>
-                        {% for meal in weekly_plan.5 %}
-                            <tr class="d-flex">
-                                <td class="col-2">{{ meal.meal_name}}</td>
-                                <td class="col-8">{{ meal.recipe.name }}</td>
-                                <td class="col-2"><a href="{% url 'recipe' meal.recipe.id %}"><button class="btn btn-primary rounded-0">Szczegóły</button></a></td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <table class="table">
-                        <thead>
-                            <tr class="d-flex">
-                                <th class="col-2">Niedziela</th>
-                                <th class="col-8"></th>
-                                <th class="col-2"></th>
-                            </tr
-                        </thead>
-                        <tbody>
-                        {% for meal in weekly_plan.6 %}
-                            <tr class="d-flex">
-                                <td class="col-2">{{ meal.meal_name}}</td>
-                                <td class="col-8">{{ meal.recipe.name }}</td>
-                                <td class="col-2"><a href="{% url 'recipe' meal.recipe.id %}"><button class="btn btn-primary rounded-0">Szczegóły</button></a></td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                {% endfor %}
                 </div>
 {% endblock content %}

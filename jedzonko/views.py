@@ -8,6 +8,7 @@ from jedzonko.utils import count
 from re import split as re_split
 import datetime
 
+
 class IndexView(View):
 
     def get(self, request):
@@ -42,11 +43,13 @@ class DashboardView(View):
     def get(self, request):
         plans_no = count(Plan)
         recipes_no = count(Recipe)
+        day_names = DayName.objects.all()
         last_plan = Plan.objects.all().order_by('-created')[0]
         weekly_plan = []
-        for day_number in range(1, 8):
-            if bool(last_plan.recipeplan_set.filter(day_name=day_number)) is not False:
-                weekly_plan.append(last_plan.recipeplan_set.filter(day_name=day_number).order_by('order'))
+        for day_number in day_names:
+            meals = last_plan.recipeplan_set.filter(day_name=day_number.id).order_by('order')
+            day = DayName.objects.get(id=day_number.id).get_day_name_display()
+            weekly_plan.append((meals, day))
         return render(request, "dashboard.html", context={'plans_no': plans_no,
                                                           'recipes_no': recipes_no,
                                                           'last_plan': last_plan,
@@ -57,9 +60,10 @@ class RecipeView(View):
 
     def get(self, request, id):
         recipe = Recipe.objects.get(pk=id)
-        ingredients = re_split(r'\.|\,',recipe.ingredients)  #split on [dot|comma]
-        return render(request, "app-recipe-details.html",context={'recipe':recipe,
-                                                                  'ingridients':ingredients})
+        ingredients = re_split(r'\.|\,', recipe.ingredients)  # split on [dot|comma]
+        return render(request, "app-recipe-details.html", context={'recipe': recipe,
+                                                                   'ingridients': ingredients})
+
     def post(self,request,id):
         if 'vote_up' in request.POST:               #like
             temp_id = request.POST.get('recipe_id')
@@ -67,13 +71,12 @@ class RecipeView(View):
             recipe.votes += 1
             recipe.save()
             return redirect('recipe', id)
-        elif 'vote_down' in request.POST:
+        elif 'vote_down' in request.POST:           #dislike
             temp_id = request.POST.get('recipe_id')
             recipe = Recipe.objects.get(id=temp_id)
             recipe.votes -= 1
             recipe.save()
             return redirect('recipe', id)
-
 
 
 class RecipeListView(View):
@@ -99,19 +102,16 @@ class RecipeAddView(View):
         recipe_ingredients = request.POST.get('recipe_ingredients')
         recipe_instructions = request.POST.get('recipe_instructions')
 
-
-
-        if recipe_name !="" and recipe_time !="" and recipe_description !="" and recipe_ingredients !="" :
+        if recipe_name != "" and recipe_time != "" and recipe_description != "" and recipe_ingredients != "":
             recipe_time_int = int(recipe_time)
             if recipe_time_int > 0:
                 Recipe.objects.create(name=recipe_name, ingredients=recipe_ingredients, description=recipe_description,
-                                      preparation_time=recipe_time_int, instructions = recipe_instructions)
+                                      preparation_time=recipe_time_int, instructions=recipe_instructions)
                 return redirect('recipe_list')
             else:
                 return render(request, 'app-add-recipe.html', context={'add_data': "Wypełnij poprawnie wszystkie pola"})
         else:
             return render(request, 'app-add-recipe.html', context={'add_data': "Wypełnij poprawnie wszystkie pola"})
-
 
 
 class RecipeModifyView(View):
@@ -120,16 +120,38 @@ class RecipeModifyView(View):
         return render(request, "test.html")
 
 
-class PlanView(View):
+class RecipeDeleteView(View):
 
     def get(self, request, id):
         return render(request, "test.html")
 
 
+class PlanView(View):
+    def get(self, request, id):
+        plan = Plan.objects.get(id=id)
+        day_names = DayName.objects.all()
+        weekly_plan = []
+        for day_number in day_names:
+            meals =  plan.recipeplan_set.filter(day_name=day_number.id).order_by('order')
+            day = DayName.objects.get(id=day_number.id).get_day_name_display()
+            weekly_plan.append((meals, day))
+        return render(request, "app-details-schedules.html", context={'plan': plan,
+                                                                      'weekly_plan': weekly_plan})
+
+
 class PlanAddView(View):
 
     def get(self, request):
-        return render(request, "test.html")
+        return render(request, "app-add-schedules.html")
+
+    def post(self, request):
+        plan_name = request.POST.get('plan_name')
+        plan_description = request.POST.get('plan_description')
+
+        Plan.objects.create(name=plan_name, description = plan_description)
+        last_id = Plan.objects.all().order_by('-id')[0].id
+        return redirect('plan', last_id)
+
 
 
 class PlanAddRecipeView(View):

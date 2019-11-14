@@ -5,13 +5,13 @@ from django.db import models
 
 class DayName(models.Model):
     DAYS = (
-        ('MON', 'Monday'),
-        ('TUE', 'Tuesday'),
-        ('WED', 'Wednesday'),
-        ('THU', 'Thursday'),
-        ('FRI', 'Friday'),
-        ('SAT', 'Saturday'),
-        ('SUN', 'Sunday'),
+        ('MON', 'Poniedziałek'),
+        ('TUE', 'Wtorek'),
+        ('WED', 'Środa'),
+        ('THU', 'Czwartek'),
+        ('FRI', 'Piątek'),
+        ('SAT', 'Sobota'),
+        ('SUN', 'Niedziela'),
     )
     ORDER = (
         (1, 1),
@@ -52,6 +52,7 @@ class RecipePlan(models.Model):
     day_name = models.ForeignKey(DayName, on_delete=models.CASCADE, null=True)
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.SET_NULL, null=True)
+
 
 
 class Page(models.Model):
