@@ -125,7 +125,11 @@ class RecipeModifyView(View):
 class RecipeDeleteView(View):
 
     def get(self, request, id):
-        return render(request, "test.html")
+
+        plan_id = RecipePlan.objects.get(id=id).plan_id
+        RecipePlan.objects.get(id=id).delete()
+
+        return redirect('plan', plan_id)
 
 
 class PlanView(View):
