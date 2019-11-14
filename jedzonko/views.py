@@ -1,7 +1,7 @@
 import random
 from django.core.paginator import Paginator
 from django.http import Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
 from jedzonko.models import *
@@ -120,10 +120,7 @@ class RecipeAddView(View):
 class RecipeModifyView(View):
 
     def get(self, request, id):
-        try:
-            recipe = Recipe.objects.get(id=id)
-        except:
-            raise Http404("Brak przepisu")
+        recipe = get_object_or_404(Recipe, id=id)
         return render(request, "app-edit-recipe.html", context={"recipe": recipe})
 
     def post(self, request, id):
@@ -133,14 +130,12 @@ class RecipeModifyView(View):
         recipe_description = request.POST.get('recipe_description')
         recipe_ingredients = request.POST.get('recipe_ingredients')
         recipe_instructions = request.POST.get('recipe_instruction')
+        recipe_id = request.POST.get('recipe_id')
 
         if recipe_name != "" and recipe_time != "" and recipe_description != "" and recipe_ingredients != "":
             recipe_time_int = int(recipe_time)
             if recipe_time_int > 0:
-                try:
-                    recipe = Recipe.objects.get(id=id)
-                except:
-                    raise Http404("Brak przepisu")
+                recipe = Recipe.objects.get(id=recipe_id)
                 recipe.name = recipe_name
                 recipe.description = recipe_description
                 recipe.preparation_time = recipe_time_int
