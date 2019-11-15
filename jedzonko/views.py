@@ -1,6 +1,5 @@
 import random
 from django.core.paginator import Paginator
-from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
@@ -85,7 +84,7 @@ class RecipeView(View):
 class RecipeListView(View):
     def get(self, request):
         recipes = Recipe.objects.order_by('-votes', "created")
-        paginator = Paginator(recipes, 3)  # Show 50 recipes per page
+        paginator = Paginator(recipes, 3)  # Show 3 recipes per page
         page = request.GET.get('page')
         recipes = paginator.get_page(page)
         return render(request, 'app-recipes.html', {"object_list": recipes})
@@ -132,15 +131,15 @@ class RecipeModifyView(View):
         recipe_ingredients = request.POST.get('recipe_ingredients')
         recipe_instructions = request.POST.get('recipe_instructions')
         recipe = Recipe.objects.get(id=recipe_id)
-        error_info = "Nie zapisano do bazy. Proszę wypełnij poprawnie wszystkie pola."
+        info = "Nie zapisano do bazy. Proszę wypełnij poprawnie wszystkie pola."
         try:
             recipe_time_int = int(recipe_time)
         except TypeError:
-            return render(request, 'app-edit-recipe.html', context={"recipe": recipe, 'error_info': error_info})
+            return render(request, 'app-edit-recipe.html', context={"recipe": recipe, 'info': info})
         if "" in (
                 recipe_name, recipe_time, recipe_description, recipe_ingredients,
                 recipe_instructions) or recipe_time_int < 0:
-            return render(request, 'app-edit-recipe.html', context={"recipe": recipe, 'error_info': error_info})
+            return render(request, 'app-edit-recipe.html', context={"recipe": recipe, 'info': info})
         recipe.name = recipe_name
         recipe.preparation_time = recipe_time_int
         recipe.description = recipe_description
