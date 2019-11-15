@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
 from jedzonko.models import *
-from jedzonko.utils import count, validate_int
+from jedzonko.utils import count, validate_int, validate_positive_int, error_info
 from re import split as re_split
 from django.contrib import messages
 import datetime
@@ -84,7 +84,7 @@ class RecipeView(View):
 class RecipeListView(View):
     def get(self, request):
         recipes = Recipe.objects.order_by('-votes', "created")
-        paginator = Paginator(recipes, 3)  # Show 3 recipes per page
+        paginator = Paginator(recipes, 10)  # Show 10 recipes per page
         page = request.GET.get('page')
         recipes = paginator.get_page(page)
         return render(request, 'app-recipes.html', {"object_list": recipes})
@@ -93,17 +93,15 @@ class RecipeListView(View):
 class RecipeAddView(View):
 
     def get(self, request):
-
         return render(request, "app-add-recipe.html")
 
     def post(self, request):
 
         recipe_name = request.POST.get('recipe_name')
-        recipe_time = (request.POST.get('recipe_time'))
+        recipe_time = request.POST.get('recipe_time')
         recipe_description = request.POST.get('recipe_description')
         recipe_ingredients = request.POST.get('recipe_ingredients')
         recipe_instructions = request.POST.get('recipe_instruction')
-        info = "Nie zapisano do bazy. Proszę wypełnij poprawnie wszystkie pola."
         if recipe_name and recipe_time and recipe_description and recipe_ingredients:
             recipe_time_int = int(recipe_time)
             if recipe_time_int > 0:
@@ -111,39 +109,31 @@ class RecipeAddView(View):
                                       preparation_time=recipe_time_int, instructions=recipe_instructions,
                                       ingredients=recipe_ingredients)
                 return redirect('recipe_list')
-        return render(request, 'app-add-recipe.html', context={'info': info})
+        return render(request, 'app-add-recipe.html', context={'info': error_info})
 
 
 class RecipeModifyView(View):
 
+
     def get(self, request, id):
         recipe = get_object_or_404(Recipe, id=id)
-        return render(request, "app-edit-recipe.html", context={"recipe": recipe})
+        form = 'app-edit-recipe.html'
+        return render(request, form, context={"recipe": recipe})
 
     def post(self, request, id):
         recipe_id = request.POST.get('recipe_id')
         recipe_name = request.POST.get('recipe_name')
-        recipe_time = (request.POST.get('recipe_time'))
+        recipe_time = request.POST.get('recipe_time')
         recipe_description = request.POST.get('recipe_description')
         recipe_ingredients = request.POST.get('recipe_ingredients')
         recipe_instructions = request.POST.get('recipe_instructions')
-        recipe = Recipe.objects.get(id=recipe_id)
-        recipe_time = validate_int(recipe_time)
-        info = "Nie zapisano do bazy. Proszę wypełnij poprawnie wszystkie pola."
-        html = 'app-edit-recipe.html'
-        if not recipe_time:
-            return render(request, html, context={"recipe": recipe, 'info': info})
-        if "" in (
-                recipe_name, recipe_time, recipe_description, recipe_ingredients,
-                recipe_instructions) or recipe_time < 0:
-            return render(request, html, context={"recipe": recipe, 'info': info})
-        recipe = Recipe()
-        recipe.name = recipe_name
-        recipe.preparation_time = recipe_time
-        recipe.description = recipe_description
-        recipe.ingredients = recipe_ingredients
-        recipe.instructions = recipe_instructions
-        recipe.save()
+        recipe_time = validate_positive_int(recipe_time)
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        form = 'app-edit-recipe.html'
+        if not recipe_time or "" in (recipe_name, recipe_description, recipe_ingredients, recipe_instructions):
+            return render(request, form, {"recipe":recipe, "info": error_info})
+        Recipe.objects.create(name=recipe_name, preparation_time=recipe_time, description=recipe_description,
+                              ingredients=recipe_ingredients, instructions=recipe_instructions)
         return redirect('recipe_list')
 
 
