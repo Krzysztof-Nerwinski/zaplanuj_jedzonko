@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
 from jedzonko.models import *
-from jedzonko.utils import count, validate_int, validate_positive_int, error_info
+from jedzonko.utils import count, check_slug, validate_int, validate_positive_int, error_info
 from re import split as re_split
 from django.contrib import messages
 import datetime
@@ -15,29 +15,17 @@ class IndexView(View):
 
     def get(self, request):
         recipe = Recipe.objects.all()
+        slug_about = check_slug('about')
         list = []
+        carusel = []
+
         for i in recipe:
             list.append(i.id)
-
         random.shuffle(list)
 
-        carusel_one = list[0]
-        carusel_two = list[1]
-        carusel_three = list[2]
-
-        recipe_one_name = Recipe.objects.get(pk=carusel_one).name
-        recipe_one_description = Recipe.objects.get(pk=carusel_one).description
-        recipe_two_name = Recipe.objects.get(pk=carusel_two).name
-        recipe_two_description = Recipe.objects.get(pk=carusel_two).description
-        recipe_three_name = Recipe.objects.get(pk=carusel_three).name
-        recipe_three_description = Recipe.objects.get(pk=carusel_three).description
-
-        return render(request, "index.html",
-                      context={'recipe_one_name': recipe_one_name, 'recipe_one_description': recipe_one_description,
-                               'recipe_two_name': recipe_two_name, 'recipe_two_description': recipe_two_description,
-                               'recipe_three_name': recipe_three_name,
-                               'recipe_three_description': recipe_three_description
-                               })
+        for i in range(3):
+            carusel.append((Recipe.objects.get(pk=list[i]).name, Recipe.objects.get(pk=list[i]).description))
+        return render(request, "index.html",context={'carusel':carusel,'slug_about':slug_about})
 
 
 class DashboardView(View):
@@ -209,3 +197,9 @@ class PlanListView(View):
 class PlanModifyView(View):
     def get(self, request, id):
         return render(request, "test.html")
+
+
+class AboutView(View):
+    def get(self,request):
+        slug_about = check_slug('about')
+        return render(request,'about.html',context={'slug_about':slug_about})

@@ -32,7 +32,11 @@
             </li>
             -->
             <li class="nav-item ml-4">
-                <a class="nav-link" href="#about">o aplikacji</a>
+                {% if slug_about %}
+                    <a class="nav-link" href="{% url slug_about.slug %}">o aplikacji</a>
+                {% else %}
+                    <a class="nav-link" href="#about">o aplikacji</a>
+                {% endif %}
             </li>
             <li class="nav-item ml-4">
                 <a class="nav-link disabled" href="/recipe/list">Przepisy</a>
@@ -47,30 +51,20 @@
     <section class="padding-large bg-light">
         <div id="carouselExampleControls" class="carousel slide main-slider" data-ride="carousel">
             <div class="carousel-inner container">
-                <div class="carousel-item active">
+                {% for recipe in carusel %}
+                    {% if recipe == carusel.0 %}
+                        <div class="carousel-item active">
+                    {% else %}
+                        <div class="carousel-item">
+                    {% endif %}
                     <div class="container w-75 d-flex">
                         <div class="carousel-caption d-block">
-                            <h1>{{ recipe_one_name }} </h1>
-                            <h5> {{recipe_one_description}}</h5>
+                            <h1>{{ recipe.0 }} </h1>
+                            <h5> {{recipe.1}}</h5>
                         </div>
                     </div>
                 </div>
-                <div class="carousel-item">
-                    <div class="container w-75 d-flex">
-                        <div class="carousel-caption d-block">
-                            <h1>{{ recipe_two_name }} </h1>
-                            <h5> {{recipe_two_description}}</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="container w-75 d-flex">
-                        <div class="carousel-caption d-block">
-                            <h1>{{ recipe_three_name }} </h1>
-                            <h5> {{recipe_three_description}}</h5>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
             <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -154,16 +148,20 @@
             </div>
 
             <div class="col-7 ml-4">
-                <h1 class="pb-1">Zacznij pozytywną dietę!</h1>
-                <p>Znajdziesz tu racjonalne porady, przepisy i plany, które każdy może wdrożyć w życie. Ściągasz proste
+                {% if slug_about %}
+                    <h1 class="pb-1">{{ slug_about.title }}</h1>
+                    <p>{{ slug_about.description|safe }}</p>
+                {% else %}
+                    <h1 class="pb-1">Zacznij pozytywną dietę!</h1>
+                    <p>Znajdziesz tu racjonalne porady, przepisy i plany, które każdy może wdrożyć w życie. Ściągasz proste
                     i tanie diety, bo masz przepisy bazujące na produktach dostępnych w każdym sklepie!
                     <br>
 
                     Jestem <b>Maria Iksińska</b>. Piszę bestsellerowe książki kucharskie, ukończyłam Uniwersytet Medyczny w Łodzi oraz
                     również tam biotechnologię medyczną. Inwestuję w kolejne certyfikaty, by móc prezentować je w książkach
-                    i przepisach.
+                    i przepisach.</p>
                     </br>
-                </p>
+                {% endif %}
             </div>
         </div>
     </div>
