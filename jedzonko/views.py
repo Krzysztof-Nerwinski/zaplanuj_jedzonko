@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
 from jedzonko.models import *
-from jedzonko.utils import count
+from jedzonko.utils import count, validate_int
 from re import split as re_split
 from django.contrib import messages
 import datetime
@@ -103,18 +103,15 @@ class RecipeAddView(View):
         recipe_description = request.POST.get('recipe_description')
         recipe_ingredients = request.POST.get('recipe_ingredients')
         recipe_instructions = request.POST.get('recipe_instruction')
-
-        if recipe_name != "" and recipe_time != "" and recipe_description != "" and recipe_ingredients != "":
+        info = "Nie zapisano do bazy. Proszę wypełnij poprawnie wszystkie pola."
+        if recipe_name and recipe_time and recipe_description and recipe_ingredients:
             recipe_time_int = int(recipe_time)
             if recipe_time_int > 0:
                 Recipe.objects.create(name=recipe_name, description=recipe_description,
                                       preparation_time=recipe_time_int, instructions=recipe_instructions,
                                       ingredients=recipe_ingredients)
                 return redirect('recipe_list')
-            else:
-                return render(request, 'app-add-recipe.html', context={'add_data': "Wypełnij poprawnie wszystkie pola"})
-        else:
-            return render(request, 'app-add-recipe.html', context={'add_data': "Wypełnij poprawnie wszystkie pola"})
+        return render(request, 'app-add-recipe.html', context={'info': info})
 
 
 class RecipeModifyView(View):
@@ -131,18 +128,18 @@ class RecipeModifyView(View):
         recipe_ingredients = request.POST.get('recipe_ingredients')
         recipe_instructions = request.POST.get('recipe_instructions')
         recipe = Recipe.objects.get(id=recipe_id)
+        recipe_time = validate_int(recipe_time)
         info = "Nie zapisano do bazy. Proszę wypełnij poprawnie wszystkie pola."
-        try:
-            recipe_time_int = int(recipe_time)
-        except TypeError:
-            return render(request, 'app-edit-recipe.html', context={"recipe": recipe, 'info': info})
+        html = 'app-edit-recipe.html'
+        if not recipe_time:
+            return render(request, html, context={"recipe": recipe, 'info': info})
         if "" in (
                 recipe_name, recipe_time, recipe_description, recipe_ingredients,
-                recipe_instructions) or recipe_time_int < 0:
-            return render(request, 'app-edit-recipe.html', context={"recipe": recipe, 'info': info})
+                recipe_instructions) or recipe_time < 0:
+            return render(request, html, context={"recipe": recipe, 'info': info})
         recipe = Recipe()
         recipe.name = recipe_name
-        recipe.preparation_time = recipe_time_int
+        recipe.preparation_time = recipe_time
         recipe.description = recipe_description
         recipe.ingredients = recipe_ingredients
         recipe.instructions = recipe_instructions
