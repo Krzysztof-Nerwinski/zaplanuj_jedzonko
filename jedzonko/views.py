@@ -140,6 +140,7 @@ class RecipeModifyView(View):
                 recipe_name, recipe_time, recipe_description, recipe_ingredients,
                 recipe_instructions) or recipe_time_int < 0:
             return render(request, 'app-edit-recipe.html', context={"recipe": recipe, 'info': info})
+        recipe = Recipe()
         recipe.name = recipe_name
         recipe.preparation_time = recipe_time_int
         recipe.description = recipe_description
