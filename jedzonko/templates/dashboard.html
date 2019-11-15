@@ -52,7 +52,7 @@
                             <tr class="d-flex">
                                <td class="col-2">{{ recipe.meal_name }}</td>
                                 <td class="col-8">{{ recipe.recipe.name }}</td>
-                                <td class="col-2"><a href="{% url 'recipe' recipe.id %}"><button class="btn btn-primary rounded-0">Szczegóły</button></a></td>
+                                <td class="col-2"><a href="{% url 'recipe' recipe.recipe_id %}"><button class="btn btn-primary rounded-0">Szczegóły</button></a></td>
                             </tr>
                         </tbody>
                     {% endfor %}
