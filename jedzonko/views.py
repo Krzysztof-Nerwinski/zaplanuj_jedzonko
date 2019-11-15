@@ -7,6 +7,7 @@ from django.views import View
 from jedzonko.models import *
 from jedzonko.utils import count
 from re import split as re_split
+from django.contrib import messages
 import datetime
 import urllib
 
@@ -124,30 +125,29 @@ class RecipeModifyView(View):
         return render(request, "app-edit-recipe.html", context={"recipe": recipe})
 
     def post(self, request, id):
-
+        recipe_id = request.POST.get('recipe_id')
         recipe_name = request.POST.get('recipe_name')
         recipe_time = (request.POST.get('recipe_time'))
         recipe_description = request.POST.get('recipe_description')
         recipe_ingredients = request.POST.get('recipe_ingredients')
-        recipe_instructions = request.POST.get('recipe_instruction')
-        recipe_id = request.POST.get('recipe_id')
-
-        if recipe_name != "" and recipe_time != "" and recipe_description != "" and recipe_ingredients != "":
+        recipe_instructions = request.POST.get('recipe_instructions')
+        recipe = Recipe.objects.get(id=recipe_id)
+        error_info = "Nie zapisano do bazy. Proszę wypełnij poprawnie wszystkie pola."
+        try:
             recipe_time_int = int(recipe_time)
-            if recipe_time_int > 0:
-                recipe = Recipe.objects.get(id=recipe_id)
-                recipe.name = recipe_name
-                recipe.description = recipe_description
-                recipe.preparation_time = recipe_time_int
-                recipe.instructions = recipe_instructions
-                recipe.ingredients = recipe_ingredients
-                recipe.save()
-                return redirect('recipe_list')
-            else:
-                return render(request, 'app-edit-recipe.html',
-                              context={'add_data': "Wypełnij poprawnie wszystkie pola"})
-        else:
-            return render(request, 'app-edit-recipe.html', context={'add_data': "Wypełnij poprawnie wszystkie pola"})
+        except TypeError:
+            return render(request, 'app-edit-recipe.html', context={"recipe": recipe, 'error_info': error_info})
+        if "" in (
+                recipe_name, recipe_time, recipe_description, recipe_ingredients,
+                recipe_instructions) or recipe_time_int < 0:
+            return render(request, 'app-edit-recipe.html', context={"recipe": recipe, 'error_info': error_info})
+        recipe.name = recipe_name
+        recipe.preparation_time = recipe_time_int
+        recipe.description = recipe_description
+        recipe.ingredients = recipe_ingredients
+        recipe.instructions = recipe_instructions
+        recipe.save()
+        return redirect('recipe_list')
 
 
 class RecipeDeleteView(View):
