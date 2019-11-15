@@ -25,7 +25,7 @@ class IndexView(View):
 
         for i in range(3):
             carusel.append((Recipe.objects.get(pk=list[i]).name, Recipe.objects.get(pk=list[i]).description))
-        return render(request, "index.html",context={'carusel':carusel,'slug_about':slug_about})
+        return render(request, "index.html", context={'carusel': carusel, 'slug_about': slug_about})
 
 
 class DashboardView(View):
@@ -50,7 +50,7 @@ class RecipeView(View):
 
     def get(self, request, id):
         recipe = Recipe.objects.get(pk=id)
-        ingredients = re_split(r'\.|\,', recipe.ingredients)  # split on [dot|comma]
+        ingredients = re_split(r'[.,\r]', recipe.ingredients)  # split on [dot|comma|newline]
         return render(request, "app-recipe-details.html", context={'recipe': recipe,
                                                                    'ingridients': ingredients})
 
@@ -84,42 +84,46 @@ class RecipeAddView(View):
         return render(request, "app-add-recipe.html")
 
     def post(self, request):
-
-        recipe_name = request.POST.get('recipe_name')
-        recipe_time = request.POST.get('recipe_time')
-        recipe_description = request.POST.get('recipe_description')
-        recipe_ingredients = request.POST.get('recipe_ingredients')
-        recipe_instructions = request.POST.get('recipe_instruction')
-        if recipe_name and recipe_time and recipe_description and recipe_ingredients:
-            recipe_time_int = int(recipe_time)
-            if recipe_time_int > 0:
-                Recipe.objects.create(name=recipe_name, description=recipe_description,
-                                      preparation_time=recipe_time_int, instructions=recipe_instructions,
-                                      ingredients=recipe_ingredients)
-                return redirect('recipe_list')
-        return render(request, 'app-add-recipe.html', context={'info': error_info})
-
-
-class RecipeModifyView(View):
-
-
-    def get(self, request, id):
-        recipe = get_object_or_404(Recipe, id=id)
-        form = 'app-edit-recipe.html'
-        return render(request, form, context={"recipe": recipe})
-
-    def post(self, request, id):
-        recipe_id = request.POST.get('recipe_id')
         recipe_name = request.POST.get('recipe_name')
         recipe_time = request.POST.get('recipe_time')
         recipe_description = request.POST.get('recipe_description')
         recipe_ingredients = request.POST.get('recipe_ingredients')
         recipe_instructions = request.POST.get('recipe_instructions')
         recipe_time = validate_positive_int(recipe_time)
-        recipe = get_object_or_404(Recipe, id=recipe_id)
+        form = 'app-add-recipe.html'
+        if not recipe_time or "" in (recipe_name, recipe_description, recipe_ingredients, recipe_instructions):
+            return render(request, form, {'recipe_name': recipe_name, 'recipe_description': recipe_description,
+                                          'recipe_ingredients': recipe_ingredients,
+                                          'recipe_time': recipe_time, 'recipe_instructions': recipe_instructions,
+                                          'info': error_info})
+        Recipe.objects.create(name=recipe_name, description=recipe_description, preparation_time=recipe_time,
+                              instructions=recipe_instructions, ingredients=recipe_ingredients)
+        return redirect('recipe_list')
+
+
+class RecipeModifyView(View):
+
+    def get(self, request, id):
+        recipe = get_object_or_404(Recipe, id=id)
+        form = 'app-edit-recipe.html'
+        return render(request, form, context={'recipe_name': recipe.name, 'recipe_description': recipe.description,
+                                              'recipe_time': recipe.preparation_time,
+                                              'recipe_ingredients': recipe.ingredients,
+                                              'recipe_instructions': recipe.instructions})
+
+    def post(self, request, id):
+        recipe_name = request.POST.get('recipe_name')
+        recipe_time = request.POST.get('recipe_time')
+        recipe_description = request.POST.get('recipe_description')
+        recipe_ingredients = request.POST.get('recipe_ingredients')
+        recipe_instructions = request.POST.get('recipe_instructions')
+        recipe_time = validate_positive_int(recipe_time)
         form = 'app-edit-recipe.html'
         if not recipe_time or "" in (recipe_name, recipe_description, recipe_ingredients, recipe_instructions):
-            return render(request, form, {"recipe":recipe, "info": error_info})
+            return render(request, form, {'recipe_name': recipe_name, 'recipe_description': recipe_description,
+                                          'recipe_time': recipe_time, 'recipe_ingredients': recipe_ingredients,
+                                          'recipe_instructions': recipe_instructions,
+                                          'info': error_info})
         Recipe.objects.create(name=recipe_name, preparation_time=recipe_time, description=recipe_description,
                               ingredients=recipe_ingredients, instructions=recipe_instructions)
         return redirect('recipe_list')
@@ -200,6 +204,6 @@ class PlanModifyView(View):
 
 
 class AboutView(View):
-    def get(self,request):
+    def get(self, request):
         slug_about = check_slug('about')
-        return render(request,'about.html',context={'slug_about':slug_about})
+        return render(request, 'about.html', context={'slug_about': slug_about})
