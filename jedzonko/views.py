@@ -1,5 +1,6 @@
 import random
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
@@ -25,7 +26,7 @@ class IndexView(View):
 
         for i in range(3):
             carusel.append((Recipe.objects.get(pk=list[i]).name, Recipe.objects.get(pk=list[i]).description))
-        return render(request, "index.html",context={'carusel':carusel,'slug_about':slug_about})
+        return render(request, "index.html", context={'carusel': carusel, 'slug_about': slug_about})
 
 
 class DashboardView(View):
@@ -77,6 +78,14 @@ class RecipeListView(View):
         recipes = paginator.get_page(page)
         return render(request, 'app-recipes.html', {"object_list": recipes})
 
+    def post(self, request):
+        searched_name = request.POST.get('searched_name')
+        recipes = Recipe.objects.filter(name__icontains=searched_name)
+        paginator = Paginator(recipes, 10)  # Show 10 recipes per page
+        page = request.GET.get('page')
+        recipes = paginator.get_page(page)
+        return render(request, 'app-recipes.html', {"object_list": recipes})
+
 
 class RecipeAddView(View):
 
@@ -102,7 +111,6 @@ class RecipeAddView(View):
 
 class RecipeModifyView(View):
 
-
     def get(self, request, id):
         recipe = get_object_or_404(Recipe, id=id)
         form = 'app-edit-recipe.html'
@@ -119,7 +127,7 @@ class RecipeModifyView(View):
         recipe = get_object_or_404(Recipe, id=recipe_id)
         form = 'app-edit-recipe.html'
         if not recipe_time or "" in (recipe_name, recipe_description, recipe_ingredients, recipe_instructions):
-            return render(request, form, {"recipe":recipe, "info": error_info})
+            return render(request, form, {"recipe": recipe, "info": error_info})
         Recipe.objects.create(name=recipe_name, preparation_time=recipe_time, description=recipe_description,
                               ingredients=recipe_ingredients, instructions=recipe_instructions)
         return redirect('recipe_list')
@@ -200,6 +208,6 @@ class PlanModifyView(View):
 
 
 class AboutView(View):
-    def get(self,request):
+    def get(self, request):
         slug_about = check_slug('about')
-        return render(request,'about.html',context={'slug_about':slug_about})
+        return render(request, 'about.html', context={'slug_about': slug_about})

@@ -17,7 +17,13 @@
                     posiłek do planu</a>
             </div>
         </div>
+            <form method="post" action="">{% csrf_token %}
+            <div class="d-flex justify-content-end mb-2 pl-1">
+                    <input type="text" class="input rounded-0 pt-0 pb-0 pr-4 pl-4" style='width:12em' name="searched_name" placeholder="Nazwa przepisu">
+                    <button type="submit" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4" name="search">Szukaj</button>
 
+            </div>
+            </form>
 
         <table class="table border-bottom schedules-content">
             <thead>
@@ -77,5 +83,5 @@
                 </ul>
             </nav>
         </div>
-
+    </div>
 {% endblock content %}
