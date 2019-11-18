@@ -23,9 +23,13 @@
                 Zaplanuj <span>Jedzonko</span>
             </a>
          <div class="d-flex justify-content-around">
-             <h4 class="text-light mr-3">Imię</h4>
-             <div class="circle-div text-center"><i class="fas fa-user icon-user"></i></div>
+             <h4 class="text-light mr-3">{{ user.username }}</h4>
+             <div class="circle-div text-center mr-1"><i class="fas fa-user icon-user"></i></div>
+             {% if user.is_authenticated %}
+             <a class="btn-color" href="{% url 'logout' %}">Wyloguj się</a>
+             {% endif %}
          </div>
+
         </nav>
     </header>
 
