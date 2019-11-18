@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
 from jedzonko.models import *
-from jedzonko.utils import count, check_slug, validate_int, validate_positive_int, error_info
+from jedzonko.utils import count, check_slug, validate_int, validate_positive_int, error_info, meals
 from re import split as re_split
 from django.contrib import messages
 import datetime
@@ -51,7 +51,7 @@ class RecipeView(View):
 
     def get(self, request, id):
         recipe = Recipe.objects.get(pk=id)
-        ingredients = re_split(r'\.|\,', recipe.ingredients)  # split on [dot|comma]
+        ingredients = re_split(r'[.,\r]', recipe.ingredients)  # split on [dot|comma|newline]
         return render(request, "app-recipe-details.html", context={'recipe': recipe,
                                                                    'ingridients': ingredients})
 
@@ -93,20 +93,21 @@ class RecipeAddView(View):
         return render(request, "app-add-recipe.html")
 
     def post(self, request):
-
         recipe_name = request.POST.get('recipe_name')
         recipe_time = request.POST.get('recipe_time')
         recipe_description = request.POST.get('recipe_description')
         recipe_ingredients = request.POST.get('recipe_ingredients')
-        recipe_instructions = request.POST.get('recipe_instruction')
-        if recipe_name and recipe_time and recipe_description and recipe_ingredients:
-            recipe_time_int = int(recipe_time)
-            if recipe_time_int > 0:
-                Recipe.objects.create(name=recipe_name, description=recipe_description,
-                                      preparation_time=recipe_time_int, instructions=recipe_instructions,
-                                      ingredients=recipe_ingredients)
-                return redirect('recipe_list')
-        return render(request, 'app-add-recipe.html', context={'info': error_info})
+        recipe_instructions = request.POST.get('recipe_instructions')
+        recipe_time = validate_positive_int(recipe_time)
+        form = 'app-add-recipe.html'
+        if not recipe_time or "" in (recipe_name, recipe_description, recipe_ingredients, recipe_instructions):
+            return render(request, form, {'recipe_name': recipe_name, 'recipe_description': recipe_description,
+                                          'recipe_ingredients': recipe_ingredients,
+                                          'recipe_time': recipe_time, 'recipe_instructions': recipe_instructions,
+                                          'info': error_info})
+        Recipe.objects.create(name=recipe_name, description=recipe_description, preparation_time=recipe_time,
+                              instructions=recipe_instructions, ingredients=recipe_ingredients)
+        return redirect('recipe_list')
 
 
 class RecipeModifyView(View):
@@ -114,20 +115,24 @@ class RecipeModifyView(View):
     def get(self, request, id):
         recipe = get_object_or_404(Recipe, id=id)
         form = 'app-edit-recipe.html'
-        return render(request, form, context={"recipe": recipe})
+        return render(request, form, context={'recipe_name': recipe.name, 'recipe_description': recipe.description,
+                                              'recipe_time': recipe.preparation_time,
+                                              'recipe_ingredients': recipe.ingredients,
+                                              'recipe_instructions': recipe.instructions})
 
     def post(self, request, id):
-        recipe_id = request.POST.get('recipe_id')
         recipe_name = request.POST.get('recipe_name')
         recipe_time = request.POST.get('recipe_time')
         recipe_description = request.POST.get('recipe_description')
         recipe_ingredients = request.POST.get('recipe_ingredients')
         recipe_instructions = request.POST.get('recipe_instructions')
         recipe_time = validate_positive_int(recipe_time)
-        recipe = get_object_or_404(Recipe, id=recipe_id)
         form = 'app-edit-recipe.html'
         if not recipe_time or "" in (recipe_name, recipe_description, recipe_ingredients, recipe_instructions):
-            return render(request, form, {"recipe": recipe, "info": error_info})
+            return render(request, form, {'recipe_name': recipe_name, 'recipe_description': recipe_description,
+                                          'recipe_time': recipe_time, 'recipe_ingredients': recipe_ingredients,
+                                          'recipe_instructions': recipe_instructions,
+                                          'info': error_info})
         Recipe.objects.create(name=recipe_name, preparation_time=recipe_time, description=recipe_description,
                               ingredients=recipe_ingredients, instructions=recipe_instructions)
         return redirect('recipe_list')
@@ -177,12 +182,14 @@ class PlanAddRecipeView(View):
         day_list = DayName.objects.all()
 
         return render(request, "app-schedules-meal-recipe.html",
-                      context={'plan_list': plan_list, 'recipe_list': recipe_list, 'day_list': day_list})
+                      context={'plan_list': plan_list, 'recipe_list': recipe_list, 'day_list': day_list, 'meals': meals})
 
     def post(self, request):
         plan_id = request.POST.get('plan_id')
-        meal_name = request.POST.get('meal_name')
-        meal_no = request.POST.get('meal_no')
+        meal_data = request.POST.get('meal_name')
+        meal_data = meal_data.split(",")
+        meal_no = meal_data[0]
+        meal_name = meal_data[1]
         day_name = request.POST.get('day_name')
         recipe_id = request.POST.get('recipe_id')
 

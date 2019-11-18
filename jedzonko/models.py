@@ -5,13 +5,13 @@ from django.db import models
 
 class DayName(models.Model):
     DAYS = (
-        ('MON', 'Poniedziałek'),
-        ('TUE', 'Wtorek'),
-        ('WED', 'Środa'),
-        ('THU', 'Czwartek'),
-        ('FRI', 'Piątek'),
-        ('SAT', 'Sobota'),
-        ('SUN', 'Niedziela'),
+        ('PON', 'Poniedziałek'),
+        ('WTO', 'Wtorek'),
+        ('ŚRO', 'Środa'),
+        ('CZW', 'Czwartek'),
+        ('PT', 'Piątek'),
+        ('SB', 'Sobota'),
+        ('NDZ', 'Niedziela'),
     )
     ORDER = (
         (1, 1),
@@ -26,7 +26,6 @@ class DayName(models.Model):
     day_name = models.CharField(max_length=3, choices=DAYS)
     order = models.IntegerField(choices=ORDER, unique=True)
 
-
 class Recipe(models.Model):
     name = models.CharField(max_length=255)
     ingredients = models.TextField()
@@ -37,14 +36,11 @@ class Recipe(models.Model):
     preparation_time = models.PositiveIntegerField()
     votes = models.IntegerField(default=0)
 
-
-
 class Plan(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     recipe = models.ManyToManyField(Recipe, through='RecipePlan')
-
 
 class RecipePlan(models.Model):
     meal_name = models.CharField(max_length=255)
@@ -52,8 +48,6 @@ class RecipePlan(models.Model):
     day_name = models.ForeignKey(DayName, on_delete=models.CASCADE, null=True)
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.SET_NULL, null=True)
-
-
 
 class Page(models.Model):
     title = models.CharField(max_length=255)
