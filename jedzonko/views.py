@@ -17,6 +17,7 @@ class IndexView(View):
     def get(self, request):
         recipe = Recipe.objects.all()
         slug_about = check_slug('about')
+        slug_contact = check_slug('contact')
         list = []
         carusel = []
 
@@ -26,7 +27,8 @@ class IndexView(View):
 
         for i in range(3):
             carusel.append((Recipe.objects.get(pk=list[i]).name, Recipe.objects.get(pk=list[i]).description))
-        return render(request, "index.html", context={'carusel': carusel, 'slug_about': slug_about})
+        return render(request, "index.html",
+                      context={'carusel': carusel, 'slug_about': slug_about, 'slug_contact': slug_contact})
 
 
 class DashboardView(View):
@@ -213,17 +215,17 @@ class PlanListView(View):
 class PlanModifyView(View):
     def get(self, request, id):
         temp_plan = Plan.objects.get(id=id)
-        return render(request, "app-edit-schedules.html", context={'plan':temp_plan})
+        return render(request, "app-edit-schedules.html", context={'plan': temp_plan})
 
-    def post(self,request,id):
+    def post(self, request, id):
         temp_id = request.POST.get('plan_id')
         temp_plan = Plan.objects.get(id=temp_id)
         temp_plan.name = request.POST.get('plan_name')
         temp_plan.description = request.POST.get('plan_description')
         form = 'app-edit-schedules.html'
         if '' in (temp_plan.name, temp_plan.description):
-            return render(request,form,context={'plan':temp_plan,
-                                                'info':error_info})
+            return render(request, form, context={'plan': temp_plan,
+                                                  'info': error_info})
         temp_plan.save()
         return redirect('plan', temp_id)
 
@@ -231,4 +233,14 @@ class PlanModifyView(View):
 class AboutView(View):
     def get(self, request):
         slug_about = check_slug('about')
-        return render(request, 'about.html', context={'slug_about': slug_about})
+        slug_contact = check_slug('contact')
+        slug = check_slug('about')
+        return render(request, 'dynamic.html', context={'slug': slug, 'slug_about': slug_about, 'slug_contact': slug_contact})
+
+
+class ContactView(View):
+    def get(self, request):
+        slug_about = check_slug('about')
+        slug_contact = check_slug('contact')
+        slug = check_slug('contact')
+        return render(request, 'dynamic.html', context={'slug': slug, 'slug_about': slug_about, 'slug_contact': slug_contact})
