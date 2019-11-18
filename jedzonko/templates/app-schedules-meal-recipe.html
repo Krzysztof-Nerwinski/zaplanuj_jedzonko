@@ -37,9 +37,9 @@
                             Nazwa posiłku
                         </label>
                         <div class="col-sm-3">
-                            <select name="meal_name" class="form-control">
+                            <select name="meal_no" class="form-control">
                                 {% for key, values in meals.items %}
-                                    <option value= "{{ key}},{{ values }}"> {{ values }}</option>
+                                    <option value={{ key }}> {{ values }} </option>
                                 {% endfor %}
                             </select>
                         </div>

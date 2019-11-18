@@ -80,7 +80,7 @@ class RecipeListView(View):
 
     def post(self, request):
         searched_name = request.POST.get('searched_name')
-        recipes = Recipe.objects.filter(name__icontains=searched_name)
+        recipes = Recipe.objects.filter(name__icontains=searched_name).order_by('-votes', "created")
         paginator = Paginator(recipes, 10)  # Show 10 recipes per page
         page = request.GET.get('page')
         recipes = paginator.get_page(page)
@@ -186,10 +186,8 @@ class PlanAddRecipeView(View):
 
     def post(self, request):
         plan_id = request.POST.get('plan_id')
-        meal_data = request.POST.get('meal_name')
-        meal_data = meal_data.split(",")
-        meal_no = meal_data[0]
-        meal_name = meal_data[1]
+        meal_no = request.POST.get('meal_no')
+        meal_name = meals.get(meal_no)
         day_name = request.POST.get('day_name')
         recipe_id = request.POST.get('recipe_id')
 
