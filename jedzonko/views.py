@@ -1,5 +1,6 @@
 import random
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
@@ -72,6 +73,14 @@ class RecipeView(View):
 class RecipeListView(View):
     def get(self, request):
         recipes = Recipe.objects.order_by('-votes', "created")
+        paginator = Paginator(recipes, 10)  # Show 10 recipes per page
+        page = request.GET.get('page')
+        recipes = paginator.get_page(page)
+        return render(request, 'app-recipes.html', {"object_list": recipes})
+
+    def post(self, request):
+        searched_name = request.POST.get('searched_name')
+        recipes = Recipe.objects.filter(name__icontains=searched_name)
         paginator = Paginator(recipes, 10)  # Show 10 recipes per page
         page = request.GET.get('page')
         recipes = paginator.get_page(page)
