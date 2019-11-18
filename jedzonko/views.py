@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
 from jedzonko.models import *
-from jedzonko.utils import count, check_slug, validate_int, validate_positive_int, error_info
+from jedzonko.utils import count, check_slug, validate_int, validate_positive_int, error_info, meals
 from re import split as re_split
 from django.contrib import messages
 import datetime
@@ -173,12 +173,14 @@ class PlanAddRecipeView(View):
         day_list = DayName.objects.all()
 
         return render(request, "app-schedules-meal-recipe.html",
-                      context={'plan_list': plan_list, 'recipe_list': recipe_list, 'day_list': day_list})
+                      context={'plan_list': plan_list, 'recipe_list': recipe_list, 'day_list': day_list, 'meals': meals})
 
     def post(self, request):
         plan_id = request.POST.get('plan_id')
-        meal_name = request.POST.get('meal_name')
-        meal_no = request.POST.get('meal_no')
+        meal_data = request.POST.get('meal_name')
+        meal_data = meal_data.split(",")
+        meal_no = meal_data[0]
+        meal_name = meal_data[1]
         day_name = request.POST.get('day_name')
         recipe_id = request.POST.get('recipe_id')
 
