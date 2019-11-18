@@ -1,4 +1,7 @@
 import random
+
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -229,3 +232,45 @@ class AboutView(View):
     def get(self, request):
         slug_about = check_slug('about')
         return render(request, 'about.html', context={'slug_about': slug_about})
+
+
+class CreateUserView(View):
+    def get(self, request):
+        return render(request, 'create_user.html')
+
+    def post(self, request):
+        user_login = request.POST.get("login")
+        user_password = request.POST.get("password")
+        user_email = request.POST.get("email")
+        if not "" in (user_login, user_password, user_email):
+            User.objects.create_user(user_login, user_email, user_password)
+            message = f"Utworzono użytkownika {user_login}"
+            return render(request, 'create_user.html', context={'message': message})
+        else:
+            message = "Podano błędne dane"
+            return render(request, 'create_user.html', context={'message': message})
+
+
+class LoginView(View):
+    def get(self, request):
+        return render(request, 'login.html')
+
+    def post(self, request):
+        next_page = request.GET['next']
+        user_login = request.POST.get("login")
+        user_password = request.POST.get("password")
+        user = authenticate(username=user_login, password=user_password)
+        if user is not None:
+            # A backend authenticated the credentials
+            login(request,user)
+            return redirect(next_page)
+        else:
+            # No backend authenticated the credentials
+            return render(request, 'login.html', context={'message': "wrong password or login"})
+
+
+
+class LogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('/')
