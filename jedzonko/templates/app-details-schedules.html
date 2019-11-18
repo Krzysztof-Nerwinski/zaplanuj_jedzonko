@@ -8,7 +8,7 @@
                 <h3 class="color-header text-uppercase">SZCZEGÓŁY PLANU</h3>
             </div>
                         <div class="d-flex justify-content-end mb-2 pl-1">
-                <a href="{% url 'plan_add_recipe' plan_id_def=plan.id %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Dodaj posiłek do planu</a>
+                <a href="{% url 'plan_add_recipe' plan_id_def=plan.id recipe_id_def=0 %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Dodaj posiłek do planu</a>
             </div>
             <div class="d-flex justify-content-end mb-2 pl-1">
                 <a href="{% url 'plan_list' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>

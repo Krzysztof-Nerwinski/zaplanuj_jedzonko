@@ -176,15 +176,16 @@ class PlanAddView(View):
 
 class PlanAddRecipeView(View):
     last_plan = Plan.objects.all().order_by('-created')[0]
+    last_recipe = Recipe.objects.all().order_by('-created')[0]
 
-    def get(self, request, plan_id_def=last_plan):
+    def get(self, request, plan_id_def=last_plan, recipe_id_def=last_plan):
         plan_list = Plan.objects.all()
         recipe_list = Recipe.objects.all()
         day_list = DayName.objects.all()
 
         return render(request, "app-schedules-meal-recipe.html",
                       context={'plan_list': plan_list, 'recipe_list': recipe_list, 'day_list': day_list,
-                               'meals': meals, "plan_id_def": plan_id_def})
+                               'meals': meals, "plan_id_def": plan_id_def, "recipe_id_def": recipe_id_def})
 
     def post(self, request):
         plan_id = request.POST.get('plan_id')
