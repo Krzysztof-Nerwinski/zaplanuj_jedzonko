@@ -209,7 +209,20 @@ class PlanListView(View):
 
 class PlanModifyView(View):
     def get(self, request, id):
-        return render(request, "test.html")
+        temp_plan = Plan.objects.get(id=id)
+        return render(request, "app-edit-schedules.html", context={'plan':temp_plan})
+
+    def post(self,request,id):
+        temp_id = request.POST.get('plan_id')
+        temp_plan = Plan.objects.get(id=temp_id)
+        temp_plan.name = request.POST.get('plan_name')
+        temp_plan.description = request.POST.get('plan_description')
+        form = 'app-edit-schedules.html'
+        if '' in (temp_plan.name, temp_plan.description):
+            return render(request,form,context={'plan':temp_plan,
+                                                'info':error_info})
+        temp_plan.save()
+        return redirect('plan', temp_id)
 
 
 class AboutView(View):
