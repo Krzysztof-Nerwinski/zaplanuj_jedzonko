@@ -27,7 +27,11 @@
                         <div class="col-sm-3">
                             <select name="plan_id" class="form-control" id="choosePlan">
                                 {% for plan in plan_list %}
+                                    {% if plan.pk == plan_id_def %}
+                                    <option value={{ plan.pk }} selected="selected">{{ plan.name }}</option>
+                                    {% else %}
                                     <option value={{ plan.pk }}>{{ plan.name }}</option>
+                                    {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
