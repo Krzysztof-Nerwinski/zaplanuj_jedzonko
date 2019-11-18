@@ -470,19 +470,19 @@ margin: 0 auto !important;
 .thumbs-up {
   background: #ff6600;
   background-image: url("/static/images/thumbs_up.png");
+  background-size: contain;
   background-repeat: no-repeat;
-  width: 80px;
-  height: 100px;
-  margin-right: 1em;
-  padding-top: 70px;
+  display: inline-block;
 }
 
 .thumbs-down {
   background: #ff6600;
   background-image: url("/static/images/thumbs_down.png");
+  background-size: contain;
   background-repeat: no-repeat;
-  width: 80px;
-  height: 100px;
-  margin-right: 1em;
-  padding-top: 70px;
+  display: inline-block;
+}
+
+.inline-block {
+  display: inline-block;
 }

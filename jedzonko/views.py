@@ -245,9 +245,13 @@ class AboutView(View):
 
 class CreateUserView(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
         return render(request, 'create_user.html')
 
     def post(self, request):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
         user_login = request.POST.get("login")
         user_password = request.POST.get("password")
         user_email = request.POST.get("email")
@@ -262,6 +266,9 @@ class CreateUserView(View):
 
 class LoginView(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            message = 'Użytkownik jest już zalogowany'
+            return redirect('dashboard')
         return render(request, 'login.html')
 
     def post(self, request):
@@ -279,6 +286,7 @@ class LoginView(View):
             # No backend authenticated the credentials
             message = "Zła nazwa użytkownika lub hasło, spróbuj ponownie!"
             return render(request, 'login.html', context={'message': message})
+
 
 
 class LogoutView(View):
