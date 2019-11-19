@@ -26,17 +26,17 @@
                     <div class="dashboard-alerts">
                         <div class="alert-item alert-info">
                             <i class="fas icon-circle fa-info-circle"></i>
-                            <span class="font-weight-bold">Liczba przepisów: {{ recipes_no }}</span>
+                            <span class="font-weight-bold"><a href="{% url 'recipe_list' %}" style="text-decoration:none"> Liczba przepisów: {{ recipes_no }}</a></span>
                         </div>
                         <div class="alert-item alert-light">
                             <i class="far icon-calendar fa-calendar-alt"></i>
-                            <span class="font-weight-bold">Liczba planów: {{ plans_no }}</span>
+                            <span class="font-weight-bold"><a href="{% url 'plan_list' %}" style="text-decoration:none">Liczba planów: {{ plans_no }}</a></span>
                         </div>
                     </div>
                 </div>
                 <div class="m-4 p-4 border-dashed">
                     <h2 class="dashboard-content-title">
-                        <span>Ostatnio dodany plan:</span> {{ last_plan.name }}
+                        <span>Ostatnio dodany plan:</span><a href="{% url 'plan' last_plan.id %}" style="text-decoration:none"> {{ last_plan.name }}</a>
                     </h2>
                 {% for meals,day in weekly_plan %}
                     <table class="table">
