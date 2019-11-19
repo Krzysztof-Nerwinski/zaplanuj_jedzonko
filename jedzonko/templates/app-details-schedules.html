@@ -7,11 +7,12 @@
             <div class="col noPadding">
                 <h3 class="color-header text-uppercase">SZCZEGÓŁY PLANU</h3>
             </div>
+
+                        <div class="d-flex justify-content-end mb-2 pl-1">
+                <a href="{% url 'plan_add_recipe' plan_id_def=plan.id recipe_id_def=0 %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Dodaj posiłek do planu</a>
+          </div>
             <div class="d-flex justify-content-end mb-2 pl-1">
                 <a href="{% url 'plan_modify' plan.id %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Edytuj plan</a>
-            </div>
-            <div class="d-flex justify-content-end mb-2 pl-1">
-                <a href="{% url 'plan_add_recipe' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Dodaj posiłek do planu</a>
             </div>
             <div class="d-flex justify-content-end mb-2 pl-1">
                 <a href="{% url 'plan_list' %}" class="btn btn-color rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
@@ -54,7 +55,7 @@
                             <td class="col-2">{{ meal.meal_name }}</td>
                             <td class="col-8">{{ meal.recipe.name }}</td>
                             <td class="col-2 d-flex align-items-center justify-content-center flex-wrap">
-                                <a href="{% url 'recipe_delete' meal.recipe_id %}"
+                                <a href="{% url 'recipe_delete' meal.pk %}"
                                    class="btn btn-danger rounded-0 text-light m-1">Usuń</a>
                                 <a href="{% url 'recipe' meal.recipe_id %}"
                                    class="btn btn-info rounded-0 text-light m-1">Szczegóły</a>
