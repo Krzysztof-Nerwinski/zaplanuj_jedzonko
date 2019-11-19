@@ -272,6 +272,7 @@ class CreateUserView(View):
                 return render(request, 'create_user.html', context={'message': messages['user_exists']})
             temp_message = f"Utworzono użytkownika {user_login}"
             url = create_redirect_param('login', temp_message)
+            User.objects.create_user(username=user_login,email=user_email,password=user_password)
             return redirect(url)
         else:
             return render(request, 'create_user.html', context={'message': messages['wrong_data']})
