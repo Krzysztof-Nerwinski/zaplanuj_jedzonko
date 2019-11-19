@@ -19,11 +19,9 @@ class IndexView(View):
         slug_about = check_slug('about')
         list = []
         carusel = []
-
         for i in recipe:
             list.append(i.id)
         random.shuffle(list)
-
         for i in range(3):
             carusel.append((Recipe.objects.get(pk=list[i]).name, Recipe.objects.get(pk=list[i]).description))
         return render(request, "index.html", context={'carusel': carusel, 'slug_about': slug_about})
@@ -51,7 +49,7 @@ class RecipeView(View):
     @method_decorator(login_required)
     def get(self, request, id):
         recipe = Recipe.objects.get(pk=id)
-        ingredients = re_split(r'[.,\r]', recipe.ingredients)  # split on [dot|comma|newline]
+        ingredients = re_split(r'[.,;\r]', recipe.ingredients)  # split on [dot|comma|semicolon|newline]
         return render(request, "app-recipe-details.html", context={'recipe': recipe,
                                                                    'ingridients': ingredients})
 
@@ -175,7 +173,6 @@ class PlanAddView(View):
     def post(self, request):
         plan_name = request.POST.get('plan_name')
         plan_description = request.POST.get('plan_description')
-
         Plan.objects.create(name=plan_name, description=plan_description)
         last_id = Plan.objects.all().order_by('-id')[0].id
         return redirect('plan', last_id)
@@ -187,7 +184,6 @@ class PlanAddRecipeView(View):
         plan_list = Plan.objects.all()
         recipe_list = Recipe.objects.all()
         day_list = DayName.objects.all()
-
         return render(request, "app-schedules-meal-recipe.html",
                       context={'plan_list': plan_list, 'recipe_list': recipe_list, 'day_list': day_list,
                                'meals': meals})
@@ -199,10 +195,8 @@ class PlanAddRecipeView(View):
         meal_name = meals.get(meal_no)
         day_name = request.POST.get('day_name')
         recipe_id = request.POST.get('recipe_id')
-
         RecipePlan.objects.create(meal_name=meal_name, order=meal_no, day_name=DayName.objects.get(id=day_name),
                                   plan=Plan.objects.get(id=plan_id), recipe=Recipe.objects.get(id=recipe_id))
-
         return redirect('plan', plan_id)
 
 
@@ -267,7 +261,6 @@ class CreateUserView(View):
 class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            message = 'Użytkownik jest już zalogowany'
             return redirect('dashboard')
         return render(request, 'login.html')
 
@@ -279,14 +272,11 @@ class LoginView(View):
         user_password = request.POST.get("password")
         user = authenticate(username=user_login, password=user_password)
         if user is not None:
-            # A backend authenticated the credentials
             login(request, user)
             return redirect(next_page)
         else:
-            # No backend authenticated the credentials
             message = "Zła nazwa użytkownika lub hasło, spróbuj ponownie!"
             return render(request, 'login.html', context={'message': message})
-
 
 
 class LogoutView(View):
