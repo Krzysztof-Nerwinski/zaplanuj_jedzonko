@@ -1,5 +1,4 @@
 import random
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -7,9 +6,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
-
-from jedzonko.models import *
-from jedzonko.utils import count, check_slug, validate_positive_int, error_info, meals
+from jedzonko.utils import *
 from re import split as re_split
 
 
@@ -25,12 +22,14 @@ class IndexView(View):
         random.shuffle(list)
         for i in range(3):
             carusel.append((Recipe.objects.get(pk=list[i]).name, Recipe.objects.get(pk=list[i]).description))
-        return render(request, "index.html", context={'carusel': carusel, 'slug_about': slug_about, 'slug_contact': slug_contact})
+        return render(request, "index.html",
+                      context={'carusel': carusel, 'slug_about': slug_about, 'slug_contact': slug_contact})
 
 
 class DashboardView(View):
     @method_decorator(login_required)
     def get(self, request):
+        message = request.GET.get('message')
         plans_no = count(Plan)
         recipes_no = count(Recipe)
         day_names = DayName.objects.all().order_by("order")
@@ -40,7 +39,8 @@ class DashboardView(View):
             meals = last_plan.recipeplan_set.filter(day_name=day_number.id).order_by('order')
             day = DayName.objects.get(id=day_number.id).get_day_name_display()
             weekly_plan.append((meals, day))
-        return render(request, "dashboard.html", context={'plans_no': plans_no,
+        return render(request, "dashboard.html", context={'message': message,
+                                                          'plans_no': plans_no,
                                                           'recipes_no': recipes_no,
                                                           'last_plan': last_plan,
                                                           'weekly_plan': weekly_plan})
@@ -52,7 +52,7 @@ class RecipeView(View):
         recipe = Recipe.objects.get(pk=id)
         ingredients = re_split(r'[.,;\r]', recipe.ingredients)  # split on [dot|comma|semicolon|newline]
         return render(request, "app-recipe-details.html", context={'recipe': recipe,
-                                                                   'ingridients': ingredients})
+                                                                   'ingredients': ingredients})
 
     @method_decorator(login_required)
     def post(self, request, id):
@@ -107,7 +107,7 @@ class RecipeAddView(View):
             return render(request, form, {'recipe_name': recipe_name, 'recipe_description': recipe_description,
                                           'recipe_ingredients': recipe_ingredients,
                                           'recipe_time': recipe_time, 'recipe_instructions': recipe_instructions,
-                                          'info': error_info})
+                                          'message': messages['wrong_data']})
         Recipe.objects.create(name=recipe_name, description=recipe_description, preparation_time=recipe_time,
                               instructions=recipe_instructions, ingredients=recipe_ingredients)
         return redirect('recipe_list')
@@ -136,7 +136,7 @@ class RecipeModifyView(View):
             return render(request, form, {'recipe_name': recipe_name, 'recipe_description': recipe_description,
                                           'recipe_time': recipe_time, 'recipe_ingredients': recipe_ingredients,
                                           'recipe_instructions': recipe_instructions,
-                                          'info': error_info})
+                                          'message': messages['wrong_data']})
         Recipe.objects.create(name=recipe_name, preparation_time=recipe_time, description=recipe_description,
                               ingredients=recipe_ingredients, instructions=recipe_instructions)
         return redirect('recipe_list')
@@ -229,7 +229,7 @@ class PlanModifyView(View):
         form = 'app-edit-schedules.html'
         if '' in (temp_plan.name, temp_plan.description):
             return render(request, form, context={'plan': temp_plan,
-                                                  'info': error_info})
+                                                  'message': messages['wrong_data']})
         temp_plan.save()
         return redirect('plan', temp_id)
 
@@ -240,7 +240,8 @@ class AboutView(View):
         slug_about = check_slug('about')
         slug_contact = check_slug('contact')
         slug = check_slug('about')
-        return render(request, 'dynamic.html', context={'slug': slug, 'slug_about': slug_about, 'slug_contact': slug_contact})
+        return render(request, 'dynamic.html',
+                      context={'slug': slug, 'slug_about': slug_about, 'slug_contact': slug_contact})
 
 
 class ContactView(View):
@@ -248,13 +249,15 @@ class ContactView(View):
         slug_about = check_slug('about')
         slug_contact = check_slug('contact')
         slug = check_slug('contact')
-        return render(request, 'dynamic.html', context={'slug': slug, 'slug_about': slug_about, 'slug_contact': slug_contact})
+        return render(request, 'dynamic.html',
+                      context={'slug': slug, 'slug_about': slug_about, 'slug_contact': slug_contact})
 
 
 class CreateUserView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('dashboard')
+            url = create_redirect_param('dashboard', messages['already_logged_in'])
+            return redirect(url)
         return render(request, 'create_user.html')
 
     def post(self, request):
@@ -265,17 +268,18 @@ class CreateUserView(View):
         user_email = request.POST.get("email")
         if not "" in (user_login, user_password, user_email):
             User.objects.create_user(user_login, user_email, user_password)
-            message = f"Utworzono użytkownika {user_login}"
-            return render(request, 'create_user.html', context={'success': message})
+            temp_message = f"Utworzono użytkownika {user_login}"
+            url = create_redirect_param('login',temp_message)
+            return redirect(url)
         else:
-            message = "Podano błędne dane"
-            return render(request, 'create_user.html', context={'message': message})
+            return render(request, 'create_user.html', context={'message': messages['wrong_data']})
 
 
 class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('dashboard')
+            url = create_redirect_param('dashboard', messages['already_logged_in'])
+            return redirect(url)
         return render(request, 'login.html')
 
     def post(self, request):
@@ -289,8 +293,7 @@ class LoginView(View):
             login(request, user)
             return redirect(next_page)
         else:
-            message = "Zła nazwa użytkownika lub hasło, spróbuj ponownie!"
-            return render(request, 'login.html', context={'message': message})
+            return render(request, 'login.html', context={'message': messages['wrong_user_data']})
 
 
 class LogoutView(View):
