@@ -24,7 +24,7 @@ class IndexView(View):
             list.append(i.id)
         random.shuffle(list)
         for i in range(3):
-            carusel.append((Recipe.objects.get(pk=list[i]).name, Recipe.objects.get(pk=list[i]).description))
+            carusel.append((Recipe.objects.get(pk=list[i])))
         return render(request, "index.html", context={'carusel': carusel, 'slug_about': slug_about, 'slug_contact': slug_contact})
 
 
