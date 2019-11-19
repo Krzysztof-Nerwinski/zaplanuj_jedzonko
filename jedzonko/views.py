@@ -33,7 +33,7 @@ class DashboardView(View):
     def get(self, request):
         plans_no = count(Plan)
         recipes_no = count(Recipe)
-        day_names = DayName.objects.all()
+        day_names = DayName.objects.all().order_by("order")
         last_plan = Plan.objects.all().order_by('-created')[0]
         weekly_plan = []
         for day_number in day_names:
@@ -155,7 +155,7 @@ class PlanView(View):
     @method_decorator(login_required)
     def get(self, request, id):
         plan = Plan.objects.get(id=id)
-        day_names = DayName.objects.all()
+        day_names = DayName.objects.all().order_by("order")
         weekly_plan = []
         for day_number in day_names:
             meals = plan.recipeplan_set.filter(day_name=day_number.id).order_by('order')
