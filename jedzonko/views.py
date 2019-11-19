@@ -24,7 +24,7 @@ class IndexView(View):
             list.append(i.id)
         random.shuffle(list)
         for i in range(3):
-            carusel.append((Recipe.objects.get(pk=list[i]).name, Recipe.objects.get(pk=list[i]).description))
+            carusel.append((Recipe.objects.get(pk=list[i])))
         return render(request, "index.html", context={'carusel': carusel, 'slug_about': slug_about, 'slug_contact': slug_contact})
 
 
@@ -208,7 +208,7 @@ class PlanListView(View):
     @method_decorator(login_required)
     def get(self, request):
         plans = Plan.objects.order_by('name')
-        paginator = Paginator(plans, 3)  # Show 50 recipes per page
+        paginator = Paginator(plans, 10)  # Show 50 recipes per page
         page = request.GET.get('page')
         plans = paginator.get_page(page)
         return render(request, 'app-schedules.html', {"object_list": plans})
