@@ -1,36 +1,34 @@
 import random
+
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.decorators import method_decorator
 from django.views import View
 
 from jedzonko.models import *
-from jedzonko.utils import count, check_slug, validate_int, validate_positive_int, error_info, meals
+from jedzonko.utils import count, check_slug, validate_positive_int, error_info, meals
 from re import split as re_split
-from django.contrib import messages
-import datetime
-import urllib
 
 
 class IndexView(View):
-
     def get(self, request):
         recipe = Recipe.objects.all()
         slug_about = check_slug('about')
         list = []
         carusel = []
-
         for i in recipe:
             list.append(i.id)
         random.shuffle(list)
-
         for i in range(3):
             carusel.append((Recipe.objects.get(pk=list[i]).name, Recipe.objects.get(pk=list[i]).description))
         return render(request, "index.html", context={'carusel': carusel, 'slug_about': slug_about})
 
 
 class DashboardView(View):
-
+    @method_decorator(login_required)
     def get(self, request):
         plans_no = count(Plan)
         recipes_no = count(Recipe)
@@ -48,13 +46,14 @@ class DashboardView(View):
 
 
 class RecipeView(View):
-
+    @method_decorator(login_required)
     def get(self, request, id):
         recipe = Recipe.objects.get(pk=id)
-        ingredients = re_split(r'[.,\r]', recipe.ingredients)  # split on [dot|comma|newline]
+        ingredients = re_split(r'[.,;\r]', recipe.ingredients)  # split on [dot|comma|semicolon|newline]
         return render(request, "app-recipe-details.html", context={'recipe': recipe,
                                                                    'ingridients': ingredients})
 
+    @method_decorator(login_required)
     def post(self, request, id):
         if 'vote_up' in request.POST:  # like
             temp_id = request.POST.get('recipe_id')
@@ -71,6 +70,7 @@ class RecipeView(View):
 
 
 class RecipeListView(View):
+    @method_decorator(login_required)
     def get(self, request):
         recipes = Recipe.objects.order_by('-votes', "created")
         paginator = Paginator(recipes, 10)  # Show 10 recipes per page
@@ -78,6 +78,7 @@ class RecipeListView(View):
         recipes = paginator.get_page(page)
         return render(request, 'app-recipes.html', {"object_list": recipes})
 
+    @method_decorator(login_required)
     def post(self, request):
         searched_name = request.POST.get('searched_name')
         recipes = Recipe.objects.filter(name__icontains=searched_name).order_by('-votes', "created")
@@ -88,10 +89,11 @@ class RecipeListView(View):
 
 
 class RecipeAddView(View):
-
+    @method_decorator(login_required)
     def get(self, request):
         return render(request, "app-add-recipe.html")
 
+    @method_decorator(login_required)
     def post(self, request):
         recipe_name = request.POST.get('recipe_name')
         recipe_time = request.POST.get('recipe_time')
@@ -111,7 +113,7 @@ class RecipeAddView(View):
 
 
 class RecipeModifyView(View):
-
+    @method_decorator(login_required)
     def get(self, request, id):
         recipe = get_object_or_404(Recipe, id=id)
         form = 'app-edit-recipe.html'
@@ -120,6 +122,7 @@ class RecipeModifyView(View):
                                               'recipe_ingredients': recipe.ingredients,
                                               'recipe_instructions': recipe.instructions})
 
+    @method_decorator(login_required)
     def post(self, request, id):
         recipe_name = request.POST.get('recipe_name')
         recipe_time = request.POST.get('recipe_time')
@@ -139,7 +142,7 @@ class RecipeModifyView(View):
 
 
 class RecipeDeleteView(View):
-
+    @method_decorator(login_required)
     def get(self, request, id):
         plan_id = RecipePlan.objects.get(id=id).plan_id
         RecipePlan.objects.get(id=id).delete()
@@ -148,6 +151,7 @@ class RecipeDeleteView(View):
 
 
 class PlanView(View):
+    @method_decorator(login_required)
     def get(self, request, id):
         plan = Plan.objects.get(id=id)
         day_names = DayName.objects.all()
@@ -161,14 +165,14 @@ class PlanView(View):
 
 
 class PlanAddView(View):
-
+    @method_decorator(login_required)
     def get(self, request):
         return render(request, "app-add-schedules.html")
 
+    @method_decorator(login_required)
     def post(self, request):
         plan_name = request.POST.get('plan_name')
         plan_description = request.POST.get('plan_description')
-
         Plan.objects.create(name=plan_name, description=plan_description)
         last_id = Plan.objects.all().order_by('-id')[0].id
         return redirect('plan', last_id)
@@ -178,30 +182,29 @@ class PlanAddRecipeView(View):
     last_plan = Plan.objects.all().order_by('-created')[0]
     last_recipe = Recipe.objects.all().order_by('-created')[0]
 
+    @method_decorator(login_required)
     def get(self, request, plan_id_def=last_plan, recipe_id_def=last_plan):
         plan_list = Plan.objects.all()
         recipe_list = Recipe.objects.all()
         day_list = DayName.objects.all()
-
         return render(request, "app-schedules-meal-recipe.html",
                       context={'plan_list': plan_list, 'recipe_list': recipe_list, 'day_list': day_list,
                                'meals': meals, "plan_id_def": plan_id_def, "recipe_id_def": recipe_id_def})
 
+    @method_decorator(login_required)
     def post(self, request):
         plan_id = request.POST.get('plan_id')
         meal_no = request.POST.get('meal_no')
         meal_name = meals.get(meal_no)
         day_name = request.POST.get('day_name')
         recipe_id = request.POST.get('recipe_id')
-
         RecipePlan.objects.create(meal_name=meal_name, order=meal_no, day_name=DayName.objects.get(id=day_name),
                                   plan=Plan.objects.get(id=plan_id), recipe=Recipe.objects.get(id=recipe_id))
-
         return redirect('plan', plan_id)
 
 
 class PlanListView(View):
-
+    @method_decorator(login_required)
     def get(self, request):
         plans = Plan.objects.order_by('name')
         paginator = Paginator(plans, 3)  # Show 50 recipes per page
@@ -211,24 +214,75 @@ class PlanListView(View):
 
 
 class PlanModifyView(View):
+    @method_decorator(login_required)
     def get(self, request, id):
         temp_plan = Plan.objects.get(id=id)
-        return render(request, "app-edit-schedules.html", context={'plan':temp_plan})
+        return render(request, "app-edit-schedules.html", context={'plan': temp_plan})
 
-    def post(self,request,id):
+    @method_decorator(login_required)
+    def post(self, request, id):
         temp_id = request.POST.get('plan_id')
         temp_plan = Plan.objects.get(id=temp_id)
         temp_plan.name = request.POST.get('plan_name')
         temp_plan.description = request.POST.get('plan_description')
         form = 'app-edit-schedules.html'
         if '' in (temp_plan.name, temp_plan.description):
-            return render(request,form,context={'plan':temp_plan,
-                                                'info':error_info})
+            return render(request, form, context={'plan': temp_plan,
+                                                  'info': error_info})
         temp_plan.save()
         return redirect('plan', temp_id)
 
 
 class AboutView(View):
+    @method_decorator(login_required)
     def get(self, request):
         slug_about = check_slug('about')
         return render(request, 'about.html', context={'slug_about': slug_about})
+
+
+class CreateUserView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+        return render(request, 'create_user.html')
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+        user_login = request.POST.get("login")
+        user_password = request.POST.get("password")
+        user_email = request.POST.get("email")
+        if not "" in (user_login, user_password, user_email):
+            User.objects.create_user(user_login, user_email, user_password)
+            message = f"Utworzono użytkownika {user_login}"
+            return render(request, 'create_user.html', context={'success': message})
+        else:
+            message = "Podano błędne dane"
+            return render(request, 'create_user.html', context={'message': message})
+
+
+class LoginView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+        return render(request, 'login.html')
+
+    def post(self, request):
+        next_page = request.GET.get('next')
+        if next_page is None:
+            next_page = 'dashboard'
+        user_login = request.POST.get("login")
+        user_password = request.POST.get("password")
+        user = authenticate(username=user_login, password=user_password)
+        if user is not None:
+            login(request, user)
+            return redirect(next_page)
+        else:
+            message = "Zła nazwa użytkownika lub hasło, spróbuj ponownie!"
+            return render(request, 'login.html', context={'message': message})
+
+
+class LogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('/')
