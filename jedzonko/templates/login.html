@@ -4,11 +4,6 @@
 
 {% block content %}
 
-{% if message %}
-    <b>{{ message }}</b><br>
-{% endif %}
-<b> {{ acces_denied }}</b>
-
 <div class="dashboard-content border-dashed p-3 m-4">
 <h2> Zaloguj się </h2> <br>
 <form method="POST"> {% csrf_token %}

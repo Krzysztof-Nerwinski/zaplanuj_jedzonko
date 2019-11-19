@@ -23,14 +23,6 @@
             Zaplanuj <span>Jedzonko</span>
         </a>
         <ul class="nav nounderline text-uppercase">
-            <!--
-            <li class="nav-item ml-4">
-                <a class="nav-link color-header" href="login.html">logowanie</a>
-            </li>
-            <li class="nav-item ml-4">
-                <a class="nav-link color-header" href="registration.html">rejestracja</a>
-            </li>
-            -->
             <li class="nav-item ml-4">
                 {% if slug_about %}
                     <a class="nav-link" href="{% url slug_about.slug %}">o aplikacji</a>
@@ -48,6 +40,14 @@
                     <a class="nav-link" href="#contact">Kontakt</a>
                 {% endif %}
             </li>
+            {% if not user.is_authenticated %}
+                <li class="nav-item ml-4">
+                    <a class="nav-link color-header" href="{% url 'login' %}">logowanie</a>
+                </li>
+                <li class="nav-item ml-4">
+                    <a class="nav-link color-header" href="{% url 'create_user' %}">rejestracja</a>
+                </li>
+            {% endif %}
         </ul>
     </nav>
 </header>
