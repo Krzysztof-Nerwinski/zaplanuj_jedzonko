@@ -150,7 +150,7 @@ class RecipeDeleteView(View):
 class PlanView(View):
     def get(self, request, id):
         plan = Plan.objects.get(id=id)
-        day_names = DayName.objects.all()
+        day_names = DayName.objects.all().order_by("order")
         weekly_plan = []
         for day_number in day_names:
             meals = plan.recipeplan_set.filter(day_name=day_number.id).order_by('order')
