@@ -17,6 +17,7 @@ class IndexView(View):
     def get(self, request):
         recipe = Recipe.objects.all()
         slug_about = check_slug('about')
+        slug_contact = check_slug('contact')
         list = []
         carusel = []
         for i in recipe:
@@ -237,7 +238,17 @@ class AboutView(View):
     @method_decorator(login_required)
     def get(self, request):
         slug_about = check_slug('about')
-        return render(request, 'about.html', context={'slug_about': slug_about})
+        slug_contact = check_slug('contact')
+        slug = check_slug('about')
+        return render(request, 'dynamic.html', context={'slug': slug, 'slug_about': slug_about, 'slug_contact': slug_contact})
+
+
+class ContactView(View):
+    def get(self, request):
+        slug_about = check_slug('about')
+        slug_contact = check_slug('contact')
+        slug = check_slug('contact')
+        return render(request, 'dynamic.html', context={'slug': slug, 'slug_about': slug_about, 'slug_contact': slug_contact})
 
 
 class CreateUserView(View):

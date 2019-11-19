@@ -42,7 +42,11 @@
                 <a class="nav-link disabled" href="/recipe/list">Przepisy</a>
             </li>
             <li class="nav-item ml-4">
-                <a class="nav-link disabled" href="#contact">Kontakt</a>
+                 {% if slug_contact %}
+                    <a class="nav-link" href="{% url slug_contact.slug %}">Kontakt</a>
+                {% else %}
+                    <a class="nav-link" href="#contact">Kontakt</a>
+                {% endif %}
             </li>
         </ul>
     </nav>
