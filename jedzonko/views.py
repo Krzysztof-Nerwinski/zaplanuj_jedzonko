@@ -34,7 +34,7 @@ class DashboardView(View):
     def get(self, request):
         plans_no = count(Plan)
         recipes_no = count(Recipe)
-        day_names = DayName.objects.all()
+        day_names = DayName.objects.all().order_by("order")
         last_plan = Plan.objects.all().order_by('-created')[0]
         weekly_plan = []
         for day_number in day_names:
