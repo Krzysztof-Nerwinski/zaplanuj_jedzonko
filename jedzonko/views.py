@@ -208,7 +208,7 @@ class PlanListView(View):
     @method_decorator(login_required)
     def get(self, request):
         plans = Plan.objects.order_by('name')
-        paginator = Paginator(plans, 3)  # Show 50 recipes per page
+        paginator = Paginator(plans, 10)  # Show 50 recipes per page
         page = request.GET.get('page')
         plans = paginator.get_page(page)
         return render(request, 'app-schedules.html', {"object_list": plans})
