@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
+
 from jedzonko.utils import *
 from re import split as re_split
 
@@ -174,6 +175,8 @@ class PlanAddView(View):
     def post(self, request):
         plan_name = request.POST.get('plan_name')
         plan_description = request.POST.get('plan_description')
+        if '' in (plan_name, plan_description):
+            return render(request, "app-add-schedules.html", context={'message': messages['wrong_data']})
         Plan.objects.create(name=plan_name, description=plan_description)
         last_id = Plan.objects.all().order_by('-id')[0].id
         return redirect('plan', last_id)
@@ -235,7 +238,6 @@ class PlanModifyView(View):
 
 
 class AboutView(View):
-    @method_decorator(login_required)
     def get(self, request):
         slug_about = check_slug('about')
         slug_contact = check_slug('contact')
@@ -267,9 +269,10 @@ class CreateUserView(View):
         user_password = request.POST.get("password")
         user_email = request.POST.get("email")
         if not "" in (user_login, user_password, user_email):
-            User.objects.create_user(user_login, user_email, user_password)
+            if User.objects.filter(username=user_login) or User.objects.filter(email=user_email):
+                return render(request, 'create_user.html', context={'message': messages['user_exists']})
             temp_message = f"Utworzono użytkownika {user_login}"
-            url = create_redirect_param('login',temp_message)
+            url = create_redirect_param('login', temp_message)
             return redirect(url)
         else:
             return render(request, 'create_user.html', context={'message': messages['wrong_data']})
