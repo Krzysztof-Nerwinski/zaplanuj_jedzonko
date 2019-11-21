@@ -23,7 +23,8 @@ class IndexView(View):
         random.shuffle(list)
         for i in range(3):
             carusel.append((Recipe.objects.get(pk=list[i])))
-        return render(request, "index.html", context={'carusel': carusel, 'slug_about': slug_about, 'slug_contact': slug_contact})
+        return render(request, "index.html",
+                      context={'carusel': carusel, 'slug_about': slug_about, 'slug_contact': slug_contact})
 
 
 class DashboardView(View):
@@ -263,7 +264,8 @@ class CreateUserView(View):
 
     def post(self, request):
         if request.user.is_authenticated:
-            return redirect('dashboard')
+            url = create_redirect_param('dashboard', messages['already_logged_in'])
+            return redirect(url)
         user_login = request.POST.get("login")
         user_password = request.POST.get("password")
         user_email = request.POST.get("email")
@@ -272,6 +274,7 @@ class CreateUserView(View):
                 return render(request, 'create_user.html', context={'message': messages['user_exists']})
             temp_message = f"Utworzono użytkownika {user_login}"
             url = create_redirect_param('login', temp_message)
+            User.objects.create_user(username=user_login, email=user_email, password=user_password)
             return redirect(url)
         else:
             return render(request, 'create_user.html', context={'message': messages['wrong_data']})
@@ -282,12 +285,13 @@ class LoginView(View):
         if request.user.is_authenticated:
             url = create_redirect_param('dashboard', messages['already_logged_in'])
             return redirect(url)
-        return render(request, 'login.html')
+        message = request.GET.get('message')
+        next_page = request.GET.get('next') if request.GET.get('next') else ''
+        return render(request, 'login.html', context={'next': next_page,
+                                                      'message': message})
 
     def post(self, request):
-        next_page = request.GET.get('next')
-        if next_page is None:
-            next_page = 'dashboard'
+        next_page = request.POST.get('next') if request.POST.get('next') else 'dashboard'
         user_login = request.POST.get("login")
         user_password = request.POST.get("password")
         user = authenticate(username=user_login, password=user_password)
