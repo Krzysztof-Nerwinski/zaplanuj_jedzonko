@@ -263,7 +263,8 @@ class CreateUserView(View):
 
     def post(self, request):
         if request.user.is_authenticated:
-            return redirect('dashboard')
+            url = create_redirect_param('dashboard', messages['already_logged_in'])
+            return redirect(url)
         user_login = request.POST.get("login")
         user_password = request.POST.get("password")
         user_email = request.POST.get("email")
@@ -283,12 +284,11 @@ class LoginView(View):
         if request.user.is_authenticated:
             url = create_redirect_param('dashboard', messages['already_logged_in'])
             return redirect(url)
-        return render(request, 'login.html')
+        next_page = request.GET.get('next')
+        return render(request, 'login.html', context={'next': next_page})
 
     def post(self, request):
-        next_page = request.GET.get('next')
-        if next_page is None:
-            next_page = 'dashboard'
+        next_page = request.POST.get('next')
         user_login = request.POST.get("login")
         user_password = request.POST.get("password")
         user = authenticate(username=user_login, password=user_password)
