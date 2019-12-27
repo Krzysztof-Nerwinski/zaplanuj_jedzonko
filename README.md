@@ -1,4 +1,5 @@
-Projekt, który miał za zadanie nauczyć nas pracować w grupie przy użyciu metodyk zwinnych, githubowego code review oraz tablicą Trello do organizacji pracy. Projekt powstał w trzyosobowej grupie podczas kursu Back-end Web Developer - Python we wsółpracy z wykładowcą, który przyjął rolę klienta oraz Scrum Mastera.
+<i>Projekt powstał w trzyosobowej grupie podczas kursu Back-end Web Developer - Python we wsółpracy z wykładowcą, który przyjął rolę klienta oraz Scrum Mastera.
+Projekt, miał za zadanie nauczyć nas pracować w grupie przy użyciu metodyk zwinnych, githubowego code review oraz tablicy Trello do organizacji pracy.</i>
 
 # ScrumLab Python
 
