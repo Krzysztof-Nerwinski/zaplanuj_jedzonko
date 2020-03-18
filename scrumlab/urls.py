@@ -26,6 +26,7 @@ urlpatterns = [
     path('login/',LoginView.as_view(), name='login'),
     path('logout/',LogoutView.as_view(), name='logout'),
     path('create-user/', CreateUserView.as_view(), name='create_user'),
+    path('edit-user/', EditUserDataView.as_view(), name='edit_user'),
     path('recipe/<int:id>/', RecipeView.as_view(), name='recipe'),
     path('recipe/list/', RecipeListView.as_view(), name='recipe_list'),
     path('recipe/add/', RecipeAddView.as_view(), name='recipe_add'),
